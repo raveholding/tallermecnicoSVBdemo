@@ -13,7 +13,7 @@ Archivo único: `index.html`. Abre en cualquier navegador y funciona sin interne
 - **Sistema vacío:** *Probar el sistema vacío* (o `#real`) arranca de cero, con clave del dueño, como lo usaría un negocio real. Su menú es `#real-menu`.
 
 ## Módulos
-Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital y pedidos** · Clientes y vehículos · **Club y fidelización** · **Garantías** · Repuestos e inventario · Proveedores y compras · Caja · Equipamiento · Seguridad y ambiente · Personal · Reportes · Configuración.
+Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital y pedidos** · Clientes y vehículos · **Club y fidelización** · **Garantías** · Repuestos e inventario · Proveedores y compras · Caja · Equipamiento · Seguridad y ambiente · **Personal y RR. HH.** · **Tareas** · Reportes · Configuración.
 
 ## Lo que suma esta demo para un negocio completo
 - **Áreas de trabajo:** Mecánica, Electricidad, Car audio y multimedia, Alarmas y seguridad, Accesorios y estética. Cada orden lleva su tipo de trabajo. Las instalaciones suman el **control del estado eléctrico previo** (batería, tablero, levantavidrios, audio original, llaves y controles), que se imprime en la orden, y van al **box de instalaciones** de la agenda. Hay un técnico de car audio y alarmas de ejemplo.
@@ -33,6 +33,18 @@ Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital
 - **Club y fidelización:** puntos por cada $ gastado en órdenes entregadas y ventas con cliente identificado (configurable; lo pagado con puntos no suma). Tiene **niveles** Bronce, Plata y Oro por puntos acumulados, **premios para canjear**, **canje de puntos como medio de pago** al cobrar la orden, ajustes auditados, libro de movimientos y tarjeta imprimible tamaño tarjeta de crédito. Desde el menú el cliente se **suma al Club** (mayor de 18, con consentimiento) y **ve su tarjeta** con WhatsApp y fecha de nacimiento: puntos, nivel, sus vehículos con el próximo service y sus garantías vigentes.
 - **Recordatorios por WhatsApp listos para mandar:** próximo service (vencido o en 30 días), cumpleaños del mes con el beneficio, garantías por vencer y clientes que no vienen hace más de 6 meses.
 - **Garantías:** se crean solas al entregar una orden o vender un equipo con garantía. Muestra el **N.º de serie** del equipo, el estado (vigente, por vencer o vencida) y los **reclamos**, que pueden abrir una orden de trabajo.
+- **Personal y RR. HH.:**
+  - **Legajos:** DNI y CUIL validado, contacto de emergencia, área, “reporta a”, ingreso y antigüedad, contratación, horario, sueldo básico, documentación con vencimientos y capacitaciones.
+  - **Asistencia:** cada persona marca su entrada y salida en “Mi día”. Muestra llegadas tarde, horas del mes y exportación a CSV.
+  - **Vacaciones y licencias:** pedidos del empleado, aprobación del dueño, control de superposición y saldo de vacaciones por antigüedad [VERIFICAR con el contador y el convenio].
+  - **Organigrama** visual armado con los legajos, que muestra quién está presente y sus tareas.
+  - **Sueldos y adelantos:** estimación interna con básico, comisión sobre la mano de obra entregada y adelantos. Los adelantos en efectivo salen de la caja. No es un recibo de sueldo.
+- **Tareas (organigrama de tareas):**
+  - **Mi día** para cada persona, también en el panel: fichar, tareas pendientes y lo que le toca a su puesto.
+  - **Tablero del equipo** con Pendiente, En curso y Hecha, filtros por persona y área, prioridades, vencimientos y aviso por WhatsApp al asignar.
+  - **Tareas recurrentes** diarias, semanales y mensuales que se crean solas.
+  - **Responsabilidades por puesto**, que edita el dueño.
+  - Avisos de documentación por vencer, pedidos para aprobar y tareas vencidas.
 - Todo lo del sistema base: flujo de la orden con diagnóstico y fotos, mecánico sin precios, presupuesto, cobro con adicionales y descuentos, condición frente a ARCA y alta completa del cliente, inventario con equivalencias y trazabilidad, compras, caja, seguridad e higiene, reportes, roles, claves y respaldo.
 
 ## Límites (no afirmar más que esto)
@@ -41,6 +53,7 @@ Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital
 - La tarjeta del Club se consulta en el menú. No hay Apple Wallet ni Google Wallet.
 - Los mensajes de WhatsApp se abren armados y los envía una persona: no hay envíos automáticos ni API de WhatsApp Business.
 - El QR del menú no se genera dentro del sistema: se arma con cualquier generador a partir del enlace.
+- La asistencia es un registro interno (no es un reloj biométrico) y los sueldos son una estimación: la liquidación legal la hace el contador.
 - Sin facturación electrónica: la condición frente a ARCA es un dato de registro.
 - Los datos del negocio, las personas, los clientes, los vehículos, los precios y los productos de la demo son ficticios o de ejemplo. Normativa de polarizado y abonos de GPS: **[VERIFICAR]**.
 
@@ -54,6 +67,7 @@ sh tools/build.sh /ruta/a/Sebachavezcarervice/index.html
 - `tools/mk_demo.py`: quita los datos del cliente y pone los del negocio de ejemplo (nombre, logo, datos, base local propia).
 - `tools/demo_seed.js`: áreas, catálogo, productos, Club y datos de ejemplo de los módulos extra.
 - `tools/demo_ext.js`: menú digital, pedidos y turnos web, catálogo, Club, garantías y tipos de trabajo.
+- `tools/demo_rrhh_seed.js` y `tools/demo_rrhh.js`: Personal y RR. HH. (legajos, asistencia, licencias, organigrama, sueldos) y Tareas.
 - `tools/demo_patch.py`: engancha los módulos al sistema.
 
 Desarrollado por **VINCULAR BUSINESS** · (387) 4484132 · vincularbusiness@gmail.com · “Tu idea, en buenas manos.”

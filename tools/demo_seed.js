@@ -5,7 +5,7 @@ const AREA_INST=['ele','aud','ala','acc'];
 const CLUBDEF={on:true,cada:1000,ptsx:1,valor:20,niveles:[{n:'Bronce',d:0,b:'Sumás puntos en cada service, instalación y compra'},{n:'Plata',d:400,b:'Lavado de motor sin cargo en cada service'},{n:'Oro',d:1200,b:'5 % menos en mano de obra y prioridad de turno'}],cumple:'10 % de descuento en mano de obra durante tu mes de cumpleaños',vence:12};
 const MENUDEF={bienvenida:'Mecánica, car audio, alarmas y accesorios en un solo lugar.',horario:'Lunes a viernes de 8:30 a 18 · Sábados de 9 a 13',precios:true,turnos:true,club:true};
 const PREMIOSDEF=[{id:'pr1',n:'Lavado de motor',pts:250,d:'Con desengrasante y secado'},{id:'pr2',n:'Revisión de alarma y controles',pts:300,d:'Chequeo, batería de controles y ajuste de sensores'},{id:'pr3',n:'Kit LED para patente',pts:400,d:'Par de lámparas LED instaladas'},{id:'pr4',n:'Alineación sin cargo',pts:900,d:'Alineación computarizada'}];
-const DEMOVER='car3';
+const DEMOVER='car4';
 const tel10=t=>String(t||'').replace(/\D/g,'').slice(-10);
 function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==='function')return migrar(seed());
  o.cfg=o.cfg||{};o.seq=o.seq||{};
@@ -14,6 +14,7 @@ function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==
  (o.servicios||[]).forEach(s=>{if(!s.area)s.area='mec';if(s.pub==null)s.pub=true;if(s.gar==null)s.gar=0;if(s.desc==null)s.desc='';if(s.desde==null)s.desde=false});
  (o.repuestos||[]).forEach(r=>{if(r.pub==null)r.pub=false;if(r.gar==null)r.gar=0;if(r.inst==null)r.inst='';if(r.dest==null)r.dest=false});(o.ots||[]).forEach(x=>{if(!x.area)x.area='mec'});
  (o.clientes||[]).forEach(c=>{if(c.club==null)c.club=false;if(c.pts==null)c.pts=0;if(c.nac==null)c.nac='';if(c.socio==null)c.socio=0});
+ rhMigrar(o);
  if(!o.seq.socio)o.seq.socio=Math.max(0,...(o.clientes||[]).map(c=>c.socio||0));['ped','sol'].forEach(k=>{if(!o.seq[k])o.seq[k]=0});return o}
 function extSeed(d){
  d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
@@ -119,4 +120,5 @@ function extSeed(d){
  d.seq.ped=1;d.pedidos.push({id:'pw1',num:1,t:Date.now()-36e5*3,n:'Lautaro Sosa (ejemplo)',tel:'3875667788',veh:'Peugeot 208',entrega:'instalar',nota:'¿Tienen turno para el sábado?',estado:'Nuevo',items:[{k:'rep',id:rq('PAR-69-3V').id,qty:1,desc:rq('PAR-69-3V').desc,pu:r2(rq('PAR-69-3V').pv*1.21)},{k:'srv',id:'s14',qty:1,desc:'Instalación de parlantes (par)',pu:r2(18000*1.21)}]});
  d.seq.sol=2;d.solic.push({id:'sw1',num:1,t:Date.now()-36e5*5,fecha:addDays(1),hora:10,sid:'s18',n:'Micaela Torres (ejemplo)',tel:'3874112299',pat:'AD987ZX',veh:'Chevrolet Onix',nota:'Quiero alarma con bloqueo',estado:'Nueva'});
  d.solic.push({id:'sw2',num:2,t:Date.now()-36e5*20,fecha:addDays(2),hora:9,sid:'s1',n:'Raúl Cardozo (ejemplo)',tel:'3875443322',pat:'AB321CC',veh:'Fiat Cronos',nota:'',estado:'Nueva'});
+ rhSeed(d);
  return d}

@@ -12,8 +12,8 @@ def rep(a, b, n=1):
     assert c == n, (c, a[:100])
     s = s.replace(a, b)
 
-seed_js = open(os.path.join(HERE, 'demo_seed.js'), encoding='utf-8').read()
-ext_js = open(os.path.join(HERE, 'demo_ext.js'), encoding='utf-8').read()
+seed_js = open(os.path.join(HERE, 'demo_rrhh_seed.js'), encoding='utf-8').read() + '\n' + open(os.path.join(HERE, 'demo_seed.js'), encoding='utf-8').read()
+ext_js = open(os.path.join(HERE, 'demo_ext.js'), encoding='utf-8').read() + '\n' + open(os.path.join(HERE, 'demo_rrhh.js'), encoding='utf-8').read()
 
 # 1) datos, áreas y migración (antes de cargar la base)
 rep("let DB=loadDB();", seed_js + "\nlet DB=loadDB();")
