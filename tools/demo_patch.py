@@ -4,6 +4,7 @@ Uso: python3 tools/demo_patch.py index.html
 import sys, os
 HERE = os.path.dirname(os.path.abspath(__file__))
 p = sys.argv[1]
+CLIENTE = '--cliente' in sys.argv[2:]
 s = open(p, encoding='utf-8').read()
 
 def rep(a, b, n=1):
@@ -16,13 +17,13 @@ seed_js = open(os.path.join(HERE, 'demo_rrhh_seed.js'), encoding='utf-8').read()
 ext_js = open(os.path.join(HERE, 'demo_ext.js'), encoding='utf-8').read() + '\n' + open(os.path.join(HERE, 'demo_rrhh.js'), encoding='utf-8').read()
 
 # 1) datos, áreas y migración (antes de cargar la base)
-rep("let DB=loadDB();", seed_js + "\nlet DB=loadDB();")
+rep("let DB=loadDB();", 'const VB_CLIENTE=' + ('true' if CLIENTE else 'false') + ';\n' + seed_js + "\nlet DB=loadDB();")
 rep(" return d}\n\n/* ---------- estado ---------- */", " extSeed(d);\n return d}\n\n/* ---------- estado ---------- */")
 rep("(o.provs||[]).forEach(p=>{if(!p.cond)p.cond='RI'});return o}", "(o.provs||[]).forEach(p=>{if(!p.cond)p.cond='RI'});return extMigrar(o)}")
 rep("servicios:p.servicios.map(s=>({id:s.id,n:s.n,pu:0,h:s.h})),", "servicios:p.servicios.map(s=>Object.assign({},s,{pu:0})),")
 
 # 2) módulos nuevos y ruta del menú público
-rep("(function init(){", ext_js + "\n(function init(){if(/^#(real-)?menu/i.test(location.hash)){renderMenu();return}")
+rep("(function init(){", ext_js + "\n(function init(){if(/menu/i.test(location.hash)){renderMenu();return}")
 
 # 3) OT: tipo de trabajo, checklist de instalaciones, servicio vinculado
 rep("body:pickerHTML(d.cli||'',d.veh||'',true)+", "body:pickerHTML(d.cli||'',d.veh||'',true)+otAreaHTML()+")
@@ -68,8 +69,13 @@ rep("<input id=\"tu_s\" placeholder=\"Ej.: service, alineación, frenos…\">",
 rep(".tg{display:grid;grid-template-columns:60px repeat(4,minmax(150px,1fr));min-width:760px;", ".tg{display:grid;grid-template-columns:60px repeat(5,minmax(150px,1fr));min-width:900px;")
 
 # 7) acceso al menú desde el ingreso
-rep("<a href=\"#\" data-act=\"modoreal\">Probar el sistema vacío (con claves)</a>",
+if not CLIENTE:
+  rep("<a href=\"#\" data-act=\"modoreal\">Probar el sistema vacío (con claves)</a>",
     "<a href=\"#\" data-act=\"modoreal\">Probar el sistema vacío (con claves)</a><br>📱 <a href=\"#menu\" target=\"_blank\" rel=\"noopener\">Ver el menú digital que ven los clientes</a>")
+
+else:
+  rep('<a href="#practica" data-act="modopractica">Modo práctica</a></p>', '<a href="#practica" data-act="modopractica">Modo práctica</a> · 📱 <a href="#menu" target="_blank" rel="noopener">Menú digital</a></p>')
+  rep('<a href="#" data-act="modoreal">Ir al sistema real</a></div>', '<a href="#" data-act="modoreal">Ir al sistema real</a> · 📱 <a href="#practica-menu" target="_blank" rel="noopener">Menú digital de práctica</a></div>')
 
 open(p, 'w', encoding='utf-8').write(s)
 print('ok demo_patch')

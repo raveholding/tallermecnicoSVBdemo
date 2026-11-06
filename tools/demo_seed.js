@@ -17,7 +17,7 @@ function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==
  rhMigrar(o);
  if(!o.seq.socio)o.seq.socio=Math.max(0,...(o.clientes||[]).map(c=>c.socio||0));['ped','sol'].forEach(k=>{if(!o.seq[k])o.seq[k]=0});return o}
 function extSeed(d){
- d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
+ if(!VB_CLIENTE)d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
  ['solic','pedidos','ptsMov','garantias'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});d.premios=PREMIOSDEF.map(x=>Object.assign({},x));d.cfg.club=JSON.parse(JSON.stringify(CLUBDEF));d.cfg.menu=Object.assign({},MENUDEF);
  if(!d.users.some(u=>u.id==='u8'))d.users.splice(d.users.length-1,0,{id:'u8',n:'Franco Díaz',rol:'mecanico',esp:'Car audio, alarmas y electricidad',com:8});
  /* áreas del catálogo existente */
@@ -100,13 +100,13 @@ function extSeed(d){
  /* OT de instalaciones */
  const mkI=(cli,veh,mot,est,mec,dias,area,items,extra)=>{d.seq.ot++;const v=d.vehs.find(x=>x.id===veh);const cl=d.clientes.find(x=>x.id===cli)||{};
   const o=Object.assign({id:'ot'+d.seq.ot,num:d.seq.ot,fecha:addDays(-dias),cliId:cli,vehId:veh,km:v.km,motivo:mot,estado:est,mecId:mec,recurso:'4',presAprob:est!=='Recibido'&&est!=='Diagnóstico'&&est!=='Presupuesto',
-   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2',inst:{bat:true,tab:true,vid:true,aud:true,cer:true}},obs:'',pagos:[],entregada:'',ccTomado:0,pedido:'',fotos:[],presEnv:{f:addDays(-dias),u:'Martín Gómez'},presApF:addDays(-dias),area,arca:{cond:cl.cond||'CF',doc:cl.doc||''},sinIva:false,desc:null},extra||{});
+   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2',inst:{bat:true,tab:true,vid:true,aud:true,cer:true}},obs:'',pagos:[],entregada:'',ccTomado:0,pedido:'',fotos:[],presEnv:{f:addDays(-dias),u:d.users[0].n},presApF:addDays(-dias),area,arca:{cond:cl.cond||'CF',doc:cl.doc||''},sinIva:false,desc:null},extra||{});
   items.forEach(it=>{if(it[0]==='r'){const r=d.repuestos.find(x=>x.cod===it[1]);o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:it[2],pu:r.pv,pu0:r.pv,iva:r.iva,costo:r.pc})}
    else{const s=d.servicios.find(x=>x.n===it[1]);o.items.push({k:'mo',sid:s.id,desc:s.n,qty:it[2],pu:s.pu,pu0:s.pu,iva:21,costo:0})}});
   d.ots.push(o);return o};
  mkI('c2','v3','Instalar multimedia con CarPlay y cambiar parlantes delanteros','En reparación','u8',0,'aud',[['r','MM-68-CP',1],['r','PAR-65-2V',1],['m','Instalación de estéreo / multimedia Android',1],['m','Instalación de parlantes (par)',1]]);
  mkI('c6','v8','Alarma con bloqueo y cierre centralizado','Presupuesto','u8',0,'ala',[['r','ALA-2C-BLQ',1],['r','CIE-CEN-4P',1],['m','Alarma con bloqueo de arranque',1],['m','Cierre centralizado (4 puertas)',1]]);
- const g=mkI('c4','v6','Alarma con bloqueo de arranque y sensores de estacionamiento','Entregado','u8',50,'ala',[['r','ALA-2C-BLQ',1],['r','SEN-EST-4',1],['m','Alarma con bloqueo de arranque',1],['m','Sensores de estacionamiento (x4)',1]],{entregada:addDays(-49),entregadaPor:'Martín Gómez'});
+ const g=mkI('c4','v6','Alarma con bloqueo de arranque y sensores de estacionamiento','Entregado','u8',50,'ala',[['r','ALA-2C-BLQ',1],['r','SEN-EST-4',1],['m','Alarma con bloqueo de arranque',1],['m','Sensores de estacionamiento (x4)',1]],{entregada:addDays(-49),entregadaPor:d.users[0].n});
  g.pagos.push({id:uid('pg'),fecha:g.entregada,medio:'Transferencia',monto:otTotal(g).total,cajaId:''});
  const veh=d.vehs.find(x=>x.id==='v6')||{};
  d.garantias.push({id:'ga1',otId:g.id,cliId:'c4',vehId:'v6',desc:'Alarma con 2 controles y bloqueo de arranque (POSITRON)',desde:g.entregada,hasta:addDays(-49+365),serie:'PX-2231-0458',recl:[]});

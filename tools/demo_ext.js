@@ -42,7 +42,7 @@ if(!RECURSOS.includes('Box instalaciones (audio · alarmas)'))RECURSOS.push('Box
 ['jefe','recepcion'].forEach(r=>{['webp','club','garant'].forEach(v=>{if(PERM[r].indexOf(v)<0)PERM[r].push(v)})});
 (function(){const ix=NAV.findIndex(n=>n[0]==='turnos');NAV.splice(ix+1,0,['webp','🌐','Menú digital y pedidos']);const iy=NAV.findIndex(n=>n[0]==='clientes');NAV.splice(iy+1,0,['club','⭐','Club y fidelización'],['garant','🛡️','Garantías'])})();
 const _renderShell=renderShell;renderShell=function(){_renderShell();const nw=DB.pedidos.filter(p=>p.estado==='Nuevo').length+DB.solic.filter(s=>s.estado==='Nueva').length;const b=$('#nav_webp');if(b&&nw)b.insertAdjacentHTML('beforeend','<span class="badge2">'+nw+'</span>');
- const nav=$('#side nav');if(nav)nav.insertAdjacentHTML('beforeend','<a class="navmenu" href="#menu" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:center;padding:10px 14px;color:#cfd3d9;text-decoration:none;border-top:1px solid #333;margin-top:6px"><span aria-hidden="true">📱</span>Ver menú digital (público)</a>')};
+ const nav=$('#side nav');if(nav)nav.insertAdjacentHTML('beforeend','<a class="navmenu" href="'+menuHash()+'" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:center;padding:10px 14px;color:#cfd3d9;text-decoration:none;border-top:1px solid #333;margin-top:6px"><span aria-hidden="true">📱</span>Ver menú digital (público)</a>')};
 
 /* ---------- alertas extra (avisos) ---------- */
 const _alertas=alertas;alertas=function(){const A=_alertas();if(!DB.garantias)return A;
@@ -84,11 +84,13 @@ UI.webTab=UI.webTab||'ped';
 V.webp=()=>{const T=UI.webTab;const nw=DB.pedidos.filter(p=>p.estado==='Nuevo').length,ns=DB.solic.filter(s=>s.estado==='Nueva').length;
  const tabs=[['ped','Pedidos del menú'+(nw?' ('+nw+')':'')],['sol','Turnos pedidos'+(ns?' ('+ns+')':'')],['srv','Catálogo de servicios'],['prd','Productos publicados'],['cfg','Configurar menú']];
  let b='';if(T==='ped')b=webPedHTML();else if(T==='sol')b=webSolHTML();else if(T==='srv')b=webSrvHTML();else if(T==='prd')b=webPrdHTML();else b=webCfgHTML();
- return '<div class="bar"><h2>Menú digital y pedidos</h2><span class="sp"></span><a class="btn p" href="#menu" target="_blank" rel="noopener">📱 Abrir el menú público</a><button class="btn" data-act="webshare">💬 Compartir por WhatsApp</button><button class="btn" data-act="webcopy">🔗 Copiar enlace</button></div>'+
- '<div class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f">En esta demo, lo que los clientes piden desde el menú queda en este mismo navegador y además se envía por WhatsApp al taller. Con la nube del Sistema VB los pedidos llegan a todos los equipos del taller.</div>'+
+ return '<div class="bar"><h2>Menú digital y pedidos</h2><span class="sp"></span><a class="btn p" href="'+menuHash()+'" target="_blank" rel="noopener">📱 Abrir el menú público</a><button class="btn" data-act="webshare">💬 Compartir por WhatsApp</button><button class="btn" data-act="webcopy">🔗 Copiar enlace</button></div>'+
+ '<div class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f">Lo que los clientes piden desde el menú queda guardado en el navegador donde se hizo el pedido y además llega por WhatsApp al taller. Con la nube del Sistema VB los pedidos llegan solos a todos los equipos del taller.</div>'+
  '<div class="chips" style="margin-bottom:10px">'+tabs.map(t=>'<button class="chip'+(T===t[0]?' on':'')+'" data-act="webtab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+b};
 ACT.webtab=d=>{UI.webTab=d.t;renderView()};
-const menuURL=()=>location.href.split('#')[0]+(MODO==='real'?'#real-menu':'#menu');
+const menuHash=()=>VB_CLIENTE?(MODO==='real'?'#menu':'#practica-menu'):(MODO==='real'?'#real-menu':'#menu');
+const sysHash=()=>VB_CLIENTE?(MODO==='real'?'':'#practica'):(MODO==='real'?'#real':'');
+const menuURL=()=>location.href.split('#')[0]+menuHash();
 ACT.webcopy=()=>{const u=menuURL();try{navigator.clipboard.writeText(u).then(()=>toast('Enlace copiado'),()=>prompt('Copiá el enlace:',u))}catch(e){prompt('Copiá el enlace:',u)}};
 ACT.webshare=()=>window.open('https://wa.me/?text='+encodeURIComponent('Mirá nuestros servicios y productos, pedí turno y sumate al Club de '+DB.cfg.nombre+': '+menuURL()),'_blank','noopener');
 function webPedHTML(){const L=DB.pedidos.slice().sort((a,b)=>b.t-a.t);if(!L.length)return '<p class="mut">Todavía no hay pedidos del menú digital.</p>';
@@ -242,12 +244,13 @@ ACT.garrecl=d=>{const g=DB.garantias.find(x=>x.id===d.id);if(!g)return;modal({ti
 /* ======================= MENÚ DIGITAL PÚBLICO ======================= */
 const PUB={tab:'prd',cart:[],q:'',me:null,cat:''};
 try{const k=localStorage.getItem('tmvb_menu_tarjeta_'+MODO);if(k)PUB.me=k}catch(e){}
-function renderMenu(){document.title=DB.cfg.nombre+' · Menú digital';$('#login').hidden=true;$('#app').hidden=true;let p=$('#pub');if(!p){p=document.createElement('div');p.id='pub';document.body.appendChild(p)}p.innerHTML=menuHTML();
+let PUB0=false;
+function renderMenu(){if(!PUB0){PUB0=true;if(!DB.repuestos.some(r=>r.activo&&r.pub))PUB.tab='srv'}document.title=DB.cfg.nombre+' · Menú digital';$('#login').hidden=true;$('#app').hidden=true;let p=$('#pub');if(!p){p=document.createElement('div');p.id='pub';document.body.appendChild(p)}p.innerHTML=menuHTML();
  const pb=$('#pbanner');if(pb)pb.remove()}
 function menuHTML(){const C=DB.cfg,M=C.menu;const n=PUB.cart.reduce((a,i)=>a+i.qty,0);
  const tabs=[['prd','🛒 Tienda'],['srv','🧰 Servicios']].concat(M.turnos?[['tur','📅 Pedir turno']]:[]).concat(M.club&&C.club.on?[['club','⭐ Club']]:[]);
  return '<div class="ph"><img src="'+LOGO+'" alt="Logo de '+h(C.nombre)+'"><h1>'+h(C.nombre)+'</h1><p>'+h(M.bienvenida)+'</p><p class="sm">📍 '+h(C.dir)+' · 🕘 '+h(M.horario)+'</p><div class="row"><a class="btn" target="_blank" rel="noopener" href="'+h(wa(C.tel,'Hola '+C.nombre+', les escribo desde el menú digital.'))+'">💬 WhatsApp</a>'+(C.ig?'<a class="btn" style="background:#fff;color:#c13584;border-color:#fff" target="_blank" rel="noopener" href="https://instagram.com/'+encodeURIComponent(C.ig)+'">Instagram</a>':'')+'<a class="btn" style="background:transparent;color:#fff;border-color:#888" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(C.dir)+'">Cómo llegar</a></div></div>'+
- (MODO==='practica'?'<div class="demoflag" style="margin-bottom:6px"><b>DEMO del menú digital</b> · taller y precios de ejemplo. <a href="'+h(location.href.split('#')[0])+'">Entrar al sistema del taller</a></div>':'')+
+ (MODO==='practica'?'<div class="demoflag" style="margin-bottom:6px"><b>'+(VB_CLIENTE?'MODO PRÁCTICA del menú':'DEMO del menú digital')+'</b> · datos y precios de ejemplo. <a href="'+h(location.href.split('#')[0]+sysHash())+'">Entrar al sistema del taller</a></div>':'')+
  '<div class="tabs" role="tablist">'+tabs.map(t=>'<button role="tab" aria-selected="'+(PUB.tab===t[0])+'" class="'+(PUB.tab===t[0]?'on':'')+'" data-act="pubtab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+
  '<div id="pubbody">'+(PUB.tab==='srv'?pubSrvHTML():PUB.tab==='prd'?pubPrdHTML():PUB.tab==='tur'?pubTurHTML():PUB.tab==='club'?pubClubHTML():PUB.tab==='cart'?pubCartHTML():'')+'</div>'+
  '<p class="sm mut c" style="margin-top:18px">Precios finales con IVA, de referencia y sujetos a confirmación del taller según el vehículo. Los pedidos y turnos se confirman por WhatsApp.</p>'+vbBlock()+
@@ -264,7 +267,7 @@ const pubProds=()=>DB.repuestos.filter(r=>r.activo&&r.pub);
 function pubCard(r){const c=catOf(r.rubro),sv=r.inst?srvOf(r.inst):null,inst=sv&&sv.pub,sin=r.qty<=0;
  return '<div class="pc"><div class="im" style="background:'+c[1]+'" data-act="pubdet" data-id="'+r.id+'" role="button" aria-label="Ver '+h(r.desc)+'">'+c[0]+(r.dest?'<span class="dst">Destacado</span>':'')+'</div><div class="bd"><span class="sm mut">'+h(r.marca)+'</span><span class="nm" data-act="pubdet" data-id="'+r.id+'">'+h(r.desc)+'</span><div>'+stockTag(r)+(r.gar?'<span class="tag ok">🛡 '+r.gar+' m</span>':'')+'</div><span class="pp">'+pubPrice(r.pv,r.iva)+'</span></div>'+
  '<div class="bt"><button class="btn s p" data-act="pubadd" data-k="rep" data-id="'+r.id+'"'+(sin?' disabled':'')+'>'+(sin?'Sin stock':'🛒 Agregar')+'</button>'+(inst&&!sin?'<button class="btn s" style="flex-direction:column;line-height:1.2;gap:1px" data-act="pubaddi" data-id="'+r.id+'"><span>🔧 Con instalación</span>'+(DB.cfg.menu.precios&&sv.pu?'<span class="sm mut">+ '+fmt(precioFinal(sv.pu,21))+'</span>':'')+'</button>':'')+'</div></div>'}
-function pubPrdHTML(){const q=norm(PUB.q),P=pubProds();const R=Object.keys(CATS).filter(k=>P.some(r=>r.rubro===k)).concat([...new Set(P.map(r=>r.rubro))].filter(k=>!CATS[k]));
+function pubPrdHTML(){const q=norm(PUB.q),P=pubProds();if(!P.length)return '<p class="mut" style="margin-top:10px">Pronto vas a ver acá nuestros productos. Mientras tanto, <a target="_blank" rel="noopener" href="'+h(wa(DB.cfg.tel,'Hola '+DB.cfg.nombre+', ¿qué productos tienen?'))+'">consultanos por WhatsApp</a>.</p>';const R=Object.keys(CATS).filter(k=>P.some(r=>r.rubro===k)).concat([...new Set(P.map(r=>r.rubro))].filter(k=>!CATS[k]));
  let o='<input id="pubq" placeholder="Buscar: parlantes, alarma, LED, fundas…" value="'+h(PUB.q)+'" data-chg="pubq" style="margin:4px 0 8px" aria-label="Buscar productos">';
  if(q){const L=P.filter(r=>norm(r.desc+' '+r.marca+' '+r.rubro+' '+(r.apl||'')).includes(q));return o+'<p class="sm mut">'+L.length+' resultado(s)</p>'+(L.length?'<div class="pgrid">'+L.map(pubCard).join('')+'</div>':'<p class="mut">No encontramos productos con esa búsqueda. Escribinos por WhatsApp y te lo conseguimos.</p>')}
  o+='<div class="cats">'+[['','🛍️','#fff','Todo']].concat(R.map(k=>[k].concat([catOf(k)[0],catOf(k)[1],catOf(k)[2]]))).map(c=>'<button class="cat'+(PUB.cat===c[0]?' on':'')+'" data-act="pubcat" data-c="'+h(c[0])+'"><span class="e" style="background:'+c[2]+'">'+c[1]+'</span><span><b>'+h(c[3])+'</b><br><span class="sm mut">'+(c[0]?P.filter(r=>r.rubro===c[0]).length:P.length)+' productos</span></span></button>').join('')+'</div>';

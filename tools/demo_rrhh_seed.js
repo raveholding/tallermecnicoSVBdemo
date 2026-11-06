@@ -9,7 +9,7 @@ const RESPDEF={dueno:['Define precios, metas y compras grandes','Controla caja, 
  limpieza:['Limpieza del salón, baños y boxes','Orden del depósito y residuos','Reposición de insumos de limpieza']};
 function rhMigrar(o){['asis','aus','tareas','tarRec','adel'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});o.cfg=o.cfg||{};if(!o.cfg.resp)o.cfg.resp=JSON.parse(JSON.stringify(RESPDEF));
  (o.users||[]).forEach(u=>{u.leg=Object.assign({dni:'',cuil:'',nac:'',tel:'',dom:'',ingreso:'',contrato:CONTRATOS[0],area:u.rol==='dueno'?'Dirección':u.rol==='recepcion'?'Recepción y ventas':u.rol==='limpieza'?'Limpieza y mantenimiento':'Mecánica',jefe:'',basico:0,hin:'08:30',hout:'17:30',dias:'Lunes a viernes',emerg:'',docs:[],capac:[]},u.leg||{})});return o}
-function rhSeed(d){rhMigrar(d);const L={
+function rhSeed(d){rhMigrar(d);const OWN=()=>d.users[0].n;const L={
  u1:{dni:'25111222',ingreso:'2012-03-01',contrato:'Relación de dependencia',area:'Dirección',jefe:'',basico:0,tel:'3874000001',emerg:'Laura (esposa) 3874000011',hin:'08:30',hout:'18:00'},
  u2:{dni:'28333444',ingreso:'2015-06-15',area:'Mecánica',jefe:'u1',basico:1450000,tel:'3874000002',emerg:'Mónica 3874000022'},
  u3:{dni:'35555666',ingreso:'2021-02-01',area:'Recepción y ventas',jefe:'u1',basico:980000,tel:'3874000003',emerg:'Jorge 3874000033',hin:'08:00',hout:'16:00'},
@@ -29,16 +29,16 @@ function rhSeed(d){rhMigrar(d);const L={
   who.forEach((id,j)=>{const u=U(id);if(!u)return;if(id==='u6'&&i===2)return;const t0=u.leg.hin.split(':').map(Number),t1=u.leg.hout.split(':').map(Number);const de=((i*7+j*3)%17)-5,ds=((i*5+j*11)%23)-4;
    const hm=(h,m)=>{const x=h*60+m;return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')};d.asis.push({id:'as'+(++k),uid:id,f,in:hm(t0[0],t0[1]+de+(id==='u5'&&i%3===0?22:0)),out:hm(t1[0],t1[1]+ds)})})}
  who.filter(id=>id!=='u5').forEach((id,j)=>{const u=U(id);d.asis.push({id:'as'+(++k),uid:id,f:TODAY(),in:u.leg.hin.slice(0,3)+String(Math.max(0,+u.leg.hin.slice(3)-3+j)).padStart(2,'0'),out:''})});
- d.aus.push({id:'au1',uid:'u5',desde:addDays(3),hasta:addDays(9),tipo:'Vacaciones',nota:'Vacaciones de invierno',ok:true,u:'Martín Gómez'});
+ d.aus.push({id:'au1',uid:'u5',desde:addDays(3),hasta:addDays(9),tipo:'Vacaciones',nota:'Vacaciones de invierno',ok:true,u:OWN()});
  d.aus.push({id:'au2',uid:'u6',desde:addDays(-2),hasta:addDays(-2),tipo:'Enfermedad',nota:'Con certificado',ok:true,u:'Marcelo Torres'});
  d.aus.push({id:'au3',uid:'u3',desde:addDays(30),hasta:addDays(36),tipo:'Vacaciones',nota:'Pedido por la empleada',ok:false,u:'Lucía Ramos'});
- d.adel.push({id:'ad1',uid:'u6',f:addDays(-5),monto:80000,medio:'Efectivo',nota:'Adelanto de sueldo',u:'Martín Gómez'});
+ d.adel.push({id:'ad1',uid:'u6',f:addDays(-5),monto:80000,medio:'Efectivo',nota:'Adelanto de sueldo',u:OWN()});
  /* tareas recurrentes y del tablero */
  d.tarRec=[{id:'tr1',t:'Abrir caja y revisar los turnos del día',uid:'u3',area:'Recepción y ventas',freq:'d'},{id:'tr2',t:'Responder pedidos y turnos del menú digital',uid:'u3',area:'Recepción y ventas',freq:'d'},
   {id:'tr3',t:'Orden y limpieza de boxes y elevadores',uid:'u7',area:'Limpieza y mantenimiento',freq:'d'},{id:'tr4',t:'Control de herramientas y EPP',uid:'u2',area:'Mecánica',freq:'s'},
   {id:'tr5',t:'Inventario de car audio y alarmas',uid:'u8',area:'Car audio y alarmas',freq:'s'},{id:'tr6',t:'Exportar el respaldo del sistema',uid:'u1',area:'Dirección',freq:'s'},
   {id:'tr7',t:'Publicar novedades y promos en Instagram',uid:'u3',area:'Recepción y ventas',freq:'s'},{id:'tr8',t:'Control de matafuegos y botiquín',uid:'u2',area:'Mecánica',freq:'m'}];
- const T=(t,uid,area,venc,prio,est,ref)=>d.tareas.push({id:'ta'+(d.tareas.length+1),t,uid,area,venc,prio,est,ref:ref||'',rec:'',crea:'Martín Gómez',f:addDays(-1),hecha:est==='Hecha'?{u:(U(uid)||{}).n,f:addDays(-1)}:null});
+ const T=(t,uid,area,venc,prio,est,ref)=>d.tareas.push({id:'ta'+(d.tareas.length+1),t,uid,area,venc,prio,est,ref:ref||'',rec:'',crea:OWN(),f:addDays(-1),hecha:est==='Hecha'?{u:(U(uid)||{}).n,f:addDays(-1)}:null});
  T('Pedir 3 alarmas POSITRON y controles de repuesto','u2','Mecánica',addDays(1),'Alta','Pendiente','Stock en alarma');
  T('Llamar a clientes con service vencido (Club → Recordatorios)','u3','Recepción y ventas',TODAY(),'Media','En curso');
  T('Probar cámara de retroceso del Fiesta antes de entregar','u8','Car audio y alarmas',TODAY(),'Alta','Pendiente','OT del Fiesta');

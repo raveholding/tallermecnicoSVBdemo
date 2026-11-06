@@ -352,6 +352,7 @@ function seedReal(){const p=seed();
 async function hashPin(pin,salt){try{const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sbcs|'+salt+'|'+pin));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}catch(e){let x=5381;const s='sbcs|'+salt+'|'+pin;for(let i=0;i<s.length;i++)x=((x*33)^s.charCodeAt(i))>>>0;return 'f'+x.toString(16)}}
 async function setPin(u,pin){u.salt=uid('s');u.pin=await hashPin(pin,u.salt)}
 const pinOk=p=>/^\d{4,8}$/.test(p);
+const VB_CLIENTE=false;
 /* ===== DEMO: Personal, RR. HH. y tareas — datos base y de ejemplo ===== */
 const AREAS_RH=['Dirección','Mecánica','Car audio y alarmas','Recepción y ventas','Administración','Limpieza y mantenimiento'];
 const CONTRATOS=['Relación de dependencia','Monotributo (servicios)','Pasantía / práctica','Eventual'];
@@ -363,7 +364,7 @@ const RESPDEF={dueno:['Define precios, metas y compras grandes','Controla caja, 
  limpieza:['Limpieza del salón, baños y boxes','Orden del depósito y residuos','Reposición de insumos de limpieza']};
 function rhMigrar(o){['asis','aus','tareas','tarRec','adel'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});o.cfg=o.cfg||{};if(!o.cfg.resp)o.cfg.resp=JSON.parse(JSON.stringify(RESPDEF));
  (o.users||[]).forEach(u=>{u.leg=Object.assign({dni:'',cuil:'',nac:'',tel:'',dom:'',ingreso:'',contrato:CONTRATOS[0],area:u.rol==='dueno'?'Dirección':u.rol==='recepcion'?'Recepción y ventas':u.rol==='limpieza'?'Limpieza y mantenimiento':'Mecánica',jefe:'',basico:0,hin:'08:30',hout:'17:30',dias:'Lunes a viernes',emerg:'',docs:[],capac:[]},u.leg||{})});return o}
-function rhSeed(d){rhMigrar(d);const L={
+function rhSeed(d){rhMigrar(d);const OWN=()=>d.users[0].n;const L={
  u1:{dni:'25111222',ingreso:'2012-03-01',contrato:'Relación de dependencia',area:'Dirección',jefe:'',basico:0,tel:'3874000001',emerg:'Laura (esposa) 3874000011',hin:'08:30',hout:'18:00'},
  u2:{dni:'28333444',ingreso:'2015-06-15',area:'Mecánica',jefe:'u1',basico:1450000,tel:'3874000002',emerg:'Mónica 3874000022'},
  u3:{dni:'35555666',ingreso:'2021-02-01',area:'Recepción y ventas',jefe:'u1',basico:980000,tel:'3874000003',emerg:'Jorge 3874000033',hin:'08:00',hout:'16:00'},
@@ -383,16 +384,16 @@ function rhSeed(d){rhMigrar(d);const L={
   who.forEach((id,j)=>{const u=U(id);if(!u)return;if(id==='u6'&&i===2)return;const t0=u.leg.hin.split(':').map(Number),t1=u.leg.hout.split(':').map(Number);const de=((i*7+j*3)%17)-5,ds=((i*5+j*11)%23)-4;
    const hm=(h,m)=>{const x=h*60+m;return String(Math.floor(x/60)).padStart(2,'0')+':'+String(x%60).padStart(2,'0')};d.asis.push({id:'as'+(++k),uid:id,f,in:hm(t0[0],t0[1]+de+(id==='u5'&&i%3===0?22:0)),out:hm(t1[0],t1[1]+ds)})})}
  who.filter(id=>id!=='u5').forEach((id,j)=>{const u=U(id);d.asis.push({id:'as'+(++k),uid:id,f:TODAY(),in:u.leg.hin.slice(0,3)+String(Math.max(0,+u.leg.hin.slice(3)-3+j)).padStart(2,'0'),out:''})});
- d.aus.push({id:'au1',uid:'u5',desde:addDays(3),hasta:addDays(9),tipo:'Vacaciones',nota:'Vacaciones de invierno',ok:true,u:'Martín Gómez'});
+ d.aus.push({id:'au1',uid:'u5',desde:addDays(3),hasta:addDays(9),tipo:'Vacaciones',nota:'Vacaciones de invierno',ok:true,u:OWN()});
  d.aus.push({id:'au2',uid:'u6',desde:addDays(-2),hasta:addDays(-2),tipo:'Enfermedad',nota:'Con certificado',ok:true,u:'Marcelo Torres'});
  d.aus.push({id:'au3',uid:'u3',desde:addDays(30),hasta:addDays(36),tipo:'Vacaciones',nota:'Pedido por la empleada',ok:false,u:'Lucía Ramos'});
- d.adel.push({id:'ad1',uid:'u6',f:addDays(-5),monto:80000,medio:'Efectivo',nota:'Adelanto de sueldo',u:'Martín Gómez'});
+ d.adel.push({id:'ad1',uid:'u6',f:addDays(-5),monto:80000,medio:'Efectivo',nota:'Adelanto de sueldo',u:OWN()});
  /* tareas recurrentes y del tablero */
  d.tarRec=[{id:'tr1',t:'Abrir caja y revisar los turnos del día',uid:'u3',area:'Recepción y ventas',freq:'d'},{id:'tr2',t:'Responder pedidos y turnos del menú digital',uid:'u3',area:'Recepción y ventas',freq:'d'},
   {id:'tr3',t:'Orden y limpieza de boxes y elevadores',uid:'u7',area:'Limpieza y mantenimiento',freq:'d'},{id:'tr4',t:'Control de herramientas y EPP',uid:'u2',area:'Mecánica',freq:'s'},
   {id:'tr5',t:'Inventario de car audio y alarmas',uid:'u8',area:'Car audio y alarmas',freq:'s'},{id:'tr6',t:'Exportar el respaldo del sistema',uid:'u1',area:'Dirección',freq:'s'},
   {id:'tr7',t:'Publicar novedades y promos en Instagram',uid:'u3',area:'Recepción y ventas',freq:'s'},{id:'tr8',t:'Control de matafuegos y botiquín',uid:'u2',area:'Mecánica',freq:'m'}];
- const T=(t,uid,area,venc,prio,est,ref)=>d.tareas.push({id:'ta'+(d.tareas.length+1),t,uid,area,venc,prio,est,ref:ref||'',rec:'',crea:'Martín Gómez',f:addDays(-1),hecha:est==='Hecha'?{u:(U(uid)||{}).n,f:addDays(-1)}:null});
+ const T=(t,uid,area,venc,prio,est,ref)=>d.tareas.push({id:'ta'+(d.tareas.length+1),t,uid,area,venc,prio,est,ref:ref||'',rec:'',crea:OWN(),f:addDays(-1),hecha:est==='Hecha'?{u:(U(uid)||{}).n,f:addDays(-1)}:null});
  T('Pedir 3 alarmas POSITRON y controles de repuesto','u2','Mecánica',addDays(1),'Alta','Pendiente','Stock en alarma');
  T('Llamar a clientes con service vencido (Club → Recordatorios)','u3','Recepción y ventas',TODAY(),'Media','En curso');
  T('Probar cámara de retroceso del Fiesta antes de entregar','u8','Car audio y alarmas',TODAY(),'Alta','Pendiente','OT del Fiesta');
@@ -422,7 +423,7 @@ function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==
  rhMigrar(o);
  if(!o.seq.socio)o.seq.socio=Math.max(0,...(o.clientes||[]).map(c=>c.socio||0));['ped','sol'].forEach(k=>{if(!o.seq[k])o.seq[k]=0});return o}
 function extSeed(d){
- d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
+ if(!VB_CLIENTE)d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
  ['solic','pedidos','ptsMov','garantias'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});d.premios=PREMIOSDEF.map(x=>Object.assign({},x));d.cfg.club=JSON.parse(JSON.stringify(CLUBDEF));d.cfg.menu=Object.assign({},MENUDEF);
  if(!d.users.some(u=>u.id==='u8'))d.users.splice(d.users.length-1,0,{id:'u8',n:'Franco Díaz',rol:'mecanico',esp:'Car audio, alarmas y electricidad',com:8});
  /* áreas del catálogo existente */
@@ -505,13 +506,13 @@ function extSeed(d){
  /* OT de instalaciones */
  const mkI=(cli,veh,mot,est,mec,dias,area,items,extra)=>{d.seq.ot++;const v=d.vehs.find(x=>x.id===veh);const cl=d.clientes.find(x=>x.id===cli)||{};
   const o=Object.assign({id:'ot'+d.seq.ot,num:d.seq.ot,fecha:addDays(-dias),cliId:cli,vehId:veh,km:v.km,motivo:mot,estado:est,mecId:mec,recurso:'4',presAprob:est!=='Recibido'&&est!=='Diagnóstico'&&est!=='Presupuesto',
-   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2',inst:{bat:true,tab:true,vid:true,aud:true,cer:true}},obs:'',pagos:[],entregada:'',ccTomado:0,pedido:'',fotos:[],presEnv:{f:addDays(-dias),u:'Martín Gómez'},presApF:addDays(-dias),area,arca:{cond:cl.cond||'CF',doc:cl.doc||''},sinIva:false,desc:null},extra||{});
+   items:[],check:{aceite:true,luces:true,neum:true,rayones:false,auxilio:true,docs:true,comb:'1/2',inst:{bat:true,tab:true,vid:true,aud:true,cer:true}},obs:'',pagos:[],entregada:'',ccTomado:0,pedido:'',fotos:[],presEnv:{f:addDays(-dias),u:d.users[0].n},presApF:addDays(-dias),area,arca:{cond:cl.cond||'CF',doc:cl.doc||''},sinIva:false,desc:null},extra||{});
   items.forEach(it=>{if(it[0]==='r'){const r=d.repuestos.find(x=>x.cod===it[1]);o.items.push({k:'rep',repId:r.id,desc:r.desc+' ('+r.marca+')',qty:it[2],pu:r.pv,pu0:r.pv,iva:r.iva,costo:r.pc})}
    else{const s=d.servicios.find(x=>x.n===it[1]);o.items.push({k:'mo',sid:s.id,desc:s.n,qty:it[2],pu:s.pu,pu0:s.pu,iva:21,costo:0})}});
   d.ots.push(o);return o};
  mkI('c2','v3','Instalar multimedia con CarPlay y cambiar parlantes delanteros','En reparación','u8',0,'aud',[['r','MM-68-CP',1],['r','PAR-65-2V',1],['m','Instalación de estéreo / multimedia Android',1],['m','Instalación de parlantes (par)',1]]);
  mkI('c6','v8','Alarma con bloqueo y cierre centralizado','Presupuesto','u8',0,'ala',[['r','ALA-2C-BLQ',1],['r','CIE-CEN-4P',1],['m','Alarma con bloqueo de arranque',1],['m','Cierre centralizado (4 puertas)',1]]);
- const g=mkI('c4','v6','Alarma con bloqueo de arranque y sensores de estacionamiento','Entregado','u8',50,'ala',[['r','ALA-2C-BLQ',1],['r','SEN-EST-4',1],['m','Alarma con bloqueo de arranque',1],['m','Sensores de estacionamiento (x4)',1]],{entregada:addDays(-49),entregadaPor:'Martín Gómez'});
+ const g=mkI('c4','v6','Alarma con bloqueo de arranque y sensores de estacionamiento','Entregado','u8',50,'ala',[['r','ALA-2C-BLQ',1],['r','SEN-EST-4',1],['m','Alarma con bloqueo de arranque',1],['m','Sensores de estacionamiento (x4)',1]],{entregada:addDays(-49),entregadaPor:d.users[0].n});
  g.pagos.push({id:uid('pg'),fecha:g.entregada,medio:'Transferencia',monto:otTotal(g).total,cajaId:''});
  const veh=d.vehs.find(x=>x.id==='v6')||{};
  d.garantias.push({id:'ga1',otId:g.id,cliId:'c4',vehId:'v6',desc:'Alarma con 2 controles y bloqueo de arranque (POSITRON)',desde:g.entregada,hasta:addDays(-49+365),serie:'PX-2231-0458',recl:[]});
@@ -1511,7 +1512,7 @@ if(!RECURSOS.includes('Box instalaciones (audio · alarmas)'))RECURSOS.push('Box
 ['jefe','recepcion'].forEach(r=>{['webp','club','garant'].forEach(v=>{if(PERM[r].indexOf(v)<0)PERM[r].push(v)})});
 (function(){const ix=NAV.findIndex(n=>n[0]==='turnos');NAV.splice(ix+1,0,['webp','🌐','Menú digital y pedidos']);const iy=NAV.findIndex(n=>n[0]==='clientes');NAV.splice(iy+1,0,['club','⭐','Club y fidelización'],['garant','🛡️','Garantías'])})();
 const _renderShell=renderShell;renderShell=function(){_renderShell();const nw=DB.pedidos.filter(p=>p.estado==='Nuevo').length+DB.solic.filter(s=>s.estado==='Nueva').length;const b=$('#nav_webp');if(b&&nw)b.insertAdjacentHTML('beforeend','<span class="badge2">'+nw+'</span>');
- const nav=$('#side nav');if(nav)nav.insertAdjacentHTML('beforeend','<a class="navmenu" href="#menu" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:center;padding:10px 14px;color:#cfd3d9;text-decoration:none;border-top:1px solid #333;margin-top:6px"><span aria-hidden="true">📱</span>Ver menú digital (público)</a>')};
+ const nav=$('#side nav');if(nav)nav.insertAdjacentHTML('beforeend','<a class="navmenu" href="'+menuHash()+'" target="_blank" rel="noopener" style="display:flex;gap:10px;align-items:center;padding:10px 14px;color:#cfd3d9;text-decoration:none;border-top:1px solid #333;margin-top:6px"><span aria-hidden="true">📱</span>Ver menú digital (público)</a>')};
 
 /* ---------- alertas extra (avisos) ---------- */
 const _alertas=alertas;alertas=function(){const A=_alertas();if(!DB.garantias)return A;
@@ -1553,11 +1554,13 @@ UI.webTab=UI.webTab||'ped';
 V.webp=()=>{const T=UI.webTab;const nw=DB.pedidos.filter(p=>p.estado==='Nuevo').length,ns=DB.solic.filter(s=>s.estado==='Nueva').length;
  const tabs=[['ped','Pedidos del menú'+(nw?' ('+nw+')':'')],['sol','Turnos pedidos'+(ns?' ('+ns+')':'')],['srv','Catálogo de servicios'],['prd','Productos publicados'],['cfg','Configurar menú']];
  let b='';if(T==='ped')b=webPedHTML();else if(T==='sol')b=webSolHTML();else if(T==='srv')b=webSrvHTML();else if(T==='prd')b=webPrdHTML();else b=webCfgHTML();
- return '<div class="bar"><h2>Menú digital y pedidos</h2><span class="sp"></span><a class="btn p" href="#menu" target="_blank" rel="noopener">📱 Abrir el menú público</a><button class="btn" data-act="webshare">💬 Compartir por WhatsApp</button><button class="btn" data-act="webcopy">🔗 Copiar enlace</button></div>'+
- '<div class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f">En esta demo, lo que los clientes piden desde el menú queda en este mismo navegador y además se envía por WhatsApp al taller. Con la nube del Sistema VB los pedidos llegan a todos los equipos del taller.</div>'+
+ return '<div class="bar"><h2>Menú digital y pedidos</h2><span class="sp"></span><a class="btn p" href="'+menuHash()+'" target="_blank" rel="noopener">📱 Abrir el menú público</a><button class="btn" data-act="webshare">💬 Compartir por WhatsApp</button><button class="btn" data-act="webcopy">🔗 Copiar enlace</button></div>'+
+ '<div class="demoflag" style="background:#eef6ff;border-color:#b9d6f7;color:#12406f">Lo que los clientes piden desde el menú queda guardado en el navegador donde se hizo el pedido y además llega por WhatsApp al taller. Con la nube del Sistema VB los pedidos llegan solos a todos los equipos del taller.</div>'+
  '<div class="chips" style="margin-bottom:10px">'+tabs.map(t=>'<button class="chip'+(T===t[0]?' on':'')+'" data-act="webtab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+b};
 ACT.webtab=d=>{UI.webTab=d.t;renderView()};
-const menuURL=()=>location.href.split('#')[0]+(MODO==='real'?'#real-menu':'#menu');
+const menuHash=()=>VB_CLIENTE?(MODO==='real'?'#menu':'#practica-menu'):(MODO==='real'?'#real-menu':'#menu');
+const sysHash=()=>VB_CLIENTE?(MODO==='real'?'':'#practica'):(MODO==='real'?'#real':'');
+const menuURL=()=>location.href.split('#')[0]+menuHash();
 ACT.webcopy=()=>{const u=menuURL();try{navigator.clipboard.writeText(u).then(()=>toast('Enlace copiado'),()=>prompt('Copiá el enlace:',u))}catch(e){prompt('Copiá el enlace:',u)}};
 ACT.webshare=()=>window.open('https://wa.me/?text='+encodeURIComponent('Mirá nuestros servicios y productos, pedí turno y sumate al Club de '+DB.cfg.nombre+': '+menuURL()),'_blank','noopener');
 function webPedHTML(){const L=DB.pedidos.slice().sort((a,b)=>b.t-a.t);if(!L.length)return '<p class="mut">Todavía no hay pedidos del menú digital.</p>';
@@ -1711,12 +1714,13 @@ ACT.garrecl=d=>{const g=DB.garantias.find(x=>x.id===d.id);if(!g)return;modal({ti
 /* ======================= MENÚ DIGITAL PÚBLICO ======================= */
 const PUB={tab:'prd',cart:[],q:'',me:null,cat:''};
 try{const k=localStorage.getItem('tmvb_menu_tarjeta_'+MODO);if(k)PUB.me=k}catch(e){}
-function renderMenu(){document.title=DB.cfg.nombre+' · Menú digital';$('#login').hidden=true;$('#app').hidden=true;let p=$('#pub');if(!p){p=document.createElement('div');p.id='pub';document.body.appendChild(p)}p.innerHTML=menuHTML();
+let PUB0=false;
+function renderMenu(){if(!PUB0){PUB0=true;if(!DB.repuestos.some(r=>r.activo&&r.pub))PUB.tab='srv'}document.title=DB.cfg.nombre+' · Menú digital';$('#login').hidden=true;$('#app').hidden=true;let p=$('#pub');if(!p){p=document.createElement('div');p.id='pub';document.body.appendChild(p)}p.innerHTML=menuHTML();
  const pb=$('#pbanner');if(pb)pb.remove()}
 function menuHTML(){const C=DB.cfg,M=C.menu;const n=PUB.cart.reduce((a,i)=>a+i.qty,0);
  const tabs=[['prd','🛒 Tienda'],['srv','🧰 Servicios']].concat(M.turnos?[['tur','📅 Pedir turno']]:[]).concat(M.club&&C.club.on?[['club','⭐ Club']]:[]);
  return '<div class="ph"><img src="'+LOGO+'" alt="Logo de '+h(C.nombre)+'"><h1>'+h(C.nombre)+'</h1><p>'+h(M.bienvenida)+'</p><p class="sm">📍 '+h(C.dir)+' · 🕘 '+h(M.horario)+'</p><div class="row"><a class="btn" target="_blank" rel="noopener" href="'+h(wa(C.tel,'Hola '+C.nombre+', les escribo desde el menú digital.'))+'">💬 WhatsApp</a>'+(C.ig?'<a class="btn" style="background:#fff;color:#c13584;border-color:#fff" target="_blank" rel="noopener" href="https://instagram.com/'+encodeURIComponent(C.ig)+'">Instagram</a>':'')+'<a class="btn" style="background:transparent;color:#fff;border-color:#888" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(C.dir)+'">Cómo llegar</a></div></div>'+
- (MODO==='practica'?'<div class="demoflag" style="margin-bottom:6px"><b>DEMO del menú digital</b> · taller y precios de ejemplo. <a href="'+h(location.href.split('#')[0])+'">Entrar al sistema del taller</a></div>':'')+
+ (MODO==='practica'?'<div class="demoflag" style="margin-bottom:6px"><b>'+(VB_CLIENTE?'MODO PRÁCTICA del menú':'DEMO del menú digital')+'</b> · datos y precios de ejemplo. <a href="'+h(location.href.split('#')[0]+sysHash())+'">Entrar al sistema del taller</a></div>':'')+
  '<div class="tabs" role="tablist">'+tabs.map(t=>'<button role="tab" aria-selected="'+(PUB.tab===t[0])+'" class="'+(PUB.tab===t[0]?'on':'')+'" data-act="pubtab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+
  '<div id="pubbody">'+(PUB.tab==='srv'?pubSrvHTML():PUB.tab==='prd'?pubPrdHTML():PUB.tab==='tur'?pubTurHTML():PUB.tab==='club'?pubClubHTML():PUB.tab==='cart'?pubCartHTML():'')+'</div>'+
  '<p class="sm mut c" style="margin-top:18px">Precios finales con IVA, de referencia y sujetos a confirmación del taller según el vehículo. Los pedidos y turnos se confirman por WhatsApp.</p>'+vbBlock()+
@@ -1733,7 +1737,7 @@ const pubProds=()=>DB.repuestos.filter(r=>r.activo&&r.pub);
 function pubCard(r){const c=catOf(r.rubro),sv=r.inst?srvOf(r.inst):null,inst=sv&&sv.pub,sin=r.qty<=0;
  return '<div class="pc"><div class="im" style="background:'+c[1]+'" data-act="pubdet" data-id="'+r.id+'" role="button" aria-label="Ver '+h(r.desc)+'">'+c[0]+(r.dest?'<span class="dst">Destacado</span>':'')+'</div><div class="bd"><span class="sm mut">'+h(r.marca)+'</span><span class="nm" data-act="pubdet" data-id="'+r.id+'">'+h(r.desc)+'</span><div>'+stockTag(r)+(r.gar?'<span class="tag ok">🛡 '+r.gar+' m</span>':'')+'</div><span class="pp">'+pubPrice(r.pv,r.iva)+'</span></div>'+
  '<div class="bt"><button class="btn s p" data-act="pubadd" data-k="rep" data-id="'+r.id+'"'+(sin?' disabled':'')+'>'+(sin?'Sin stock':'🛒 Agregar')+'</button>'+(inst&&!sin?'<button class="btn s" style="flex-direction:column;line-height:1.2;gap:1px" data-act="pubaddi" data-id="'+r.id+'"><span>🔧 Con instalación</span>'+(DB.cfg.menu.precios&&sv.pu?'<span class="sm mut">+ '+fmt(precioFinal(sv.pu,21))+'</span>':'')+'</button>':'')+'</div></div>'}
-function pubPrdHTML(){const q=norm(PUB.q),P=pubProds();const R=Object.keys(CATS).filter(k=>P.some(r=>r.rubro===k)).concat([...new Set(P.map(r=>r.rubro))].filter(k=>!CATS[k]));
+function pubPrdHTML(){const q=norm(PUB.q),P=pubProds();if(!P.length)return '<p class="mut" style="margin-top:10px">Pronto vas a ver acá nuestros productos. Mientras tanto, <a target="_blank" rel="noopener" href="'+h(wa(DB.cfg.tel,'Hola '+DB.cfg.nombre+', ¿qué productos tienen?'))+'">consultanos por WhatsApp</a>.</p>';const R=Object.keys(CATS).filter(k=>P.some(r=>r.rubro===k)).concat([...new Set(P.map(r=>r.rubro))].filter(k=>!CATS[k]));
  let o='<input id="pubq" placeholder="Buscar: parlantes, alarma, LED, fundas…" value="'+h(PUB.q)+'" data-chg="pubq" style="margin:4px 0 8px" aria-label="Buscar productos">';
  if(q){const L=P.filter(r=>norm(r.desc+' '+r.marca+' '+r.rubro+' '+(r.apl||'')).includes(q));return o+'<p class="sm mut">'+L.length+' resultado(s)</p>'+(L.length?'<div class="pgrid">'+L.map(pubCard).join('')+'</div>':'<p class="mut">No encontramos productos con esa búsqueda. Escribinos por WhatsApp y te lo conseguimos.</p>')}
  o+='<div class="cats">'+[['','🛍️','#fff','Todo']].concat(R.map(k=>[k].concat([catOf(k)[0],catOf(k)[1],catOf(k)[2]]))).map(c=>'<button class="cat'+(PUB.cat===c[0]?' on':'')+'" data-act="pubcat" data-c="'+h(c[0])+'"><span class="e" style="background:'+c[2]+'">'+c[1]+'</span><span><b>'+h(c[3])+'</b><br><span class="sm mut">'+(c[0]?P.filter(r=>r.rubro===c[0]).length:P.length)+' productos</span></span></button>').join('')+'</div>';
@@ -1972,7 +1976,7 @@ ACT.trcdel=d=>{if(!isRH())return;confirmBox('¿Quitar esta tarea recurrente? Las
 function tarRespHTML(){const ed=ME.rol==='dueno';return '<p class="sm mut">Qué le toca a cada puesto (es la base del organigrama de tareas). '+(ed?'Una responsabilidad por renglón.':'Lo define el dueño.')+'</p><div class="g2">'+Object.keys(ROL).map(r=>{const P=DB.users.filter(u=>u.rol===r&&u.activo!==false);return '<div class="card"><h3>'+h(ROL[r])+' <span class="sm mut">'+P.map(u=>h(u.n)).join(', ')+'</span></h3>'+(ed?'<textarea data-chg="resped" data-r="'+r+'" rows="5" aria-label="Responsabilidades de '+h(ROL[r])+'">'+h((DB.cfg.resp[r]||[]).join('\n'))+'</textarea>':'<ul style="margin:0">'+(DB.cfg.resp[r]||[]).map(x=>'<li>'+h(x)+'</li>').join('')+'</ul>')+'</div>'}).join('')+'</div>'}
 CHG.resped=t=>{if(ME.rol!=='dueno')return;DB.cfg.resp[t.dataset.r]=t.value.split('\n').map(x=>x.trim()).filter(Boolean);save()};
 
-(function init(){if(/^#(real-)?menu/i.test(location.hash)){renderMenu();return}try{const id=sessionStorage.getItem(SS);if(id)ME=userOf(id)||null}catch(e){}if(ME)renderShell();else renderLogin()})();
+(function init(){if(/menu/i.test(location.hash)){renderMenu();return}try{const id=sessionStorage.getItem(SS);if(id)ME=userOf(id)||null}catch(e){}if(ME)renderShell();else renderLogin()})();
 </script>
 </body>
 </html>

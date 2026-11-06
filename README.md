@@ -61,9 +61,10 @@ Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital
 La demo se genera a partir del sistema de SebaChavez Car Service, para que las mejoras del sistema del cliente lleguen también a la demo:
 
 ```sh
-sh tools/build.sh /ruta/a/Sebachavezcarervice/index.html
+sh tools/build.sh /ruta/a/Sebachavezcarervice/tools/base.html
 ```
 
+- La base es `tools/base.html` del repo Sebachavezcarervice: `sh tools/build.sh /ruta/a/Sebachavezcarervice/tools/base.html`. Los módulos de `tools/` son los mismos en los dos repos (si se cambian acá, copiarlos allá y volver a armar los dos).
 - `tools/mk_demo.py`: quita los datos del cliente y pone los del negocio de ejemplo (nombre, logo, datos, base local propia).
 - `tools/demo_seed.js`: áreas, catálogo, productos, Club y datos de ejemplo de los módulos extra.
 - `tools/demo_ext.js`: menú digital, pedidos y turnos web, catálogo, Club, garantías y tipos de trabajo.
