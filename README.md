@@ -18,6 +18,7 @@ Archivo único: `index.html`. Abre en cualquier navegador y funciona sin interne
 - **El mecánico no ve precios** en ninguna pantalla ni impresión. Ve sus órdenes y las que están sin asignar. Carga el diagnóstico con hasta 6 fotos y recomienda repuestos o trabajos.
 - **Presupuesto** armado por el dueño o el jefe y aprobado por el cliente sin cobro. Se cobra al entregar el vehículo, con adicionales, descuento por renglón o sobre el total e IVA opcional. Envío por WhatsApp e impresión.
 - **Condición frente a ARCA:** al elegir el cliente en la OT o en la venta (y el proveedor en las compras) se indica su condición: Consumidor Final, Responsable Inscripto, Monotributo, Exento, etc. El CUIT se valida y la condición queda guardada en la ficha y en el comprobante interno.
+- **Alta completa del cliente** desde la ficha, una nueva OT, un turno o una venta: nombre o razón social, teléfono, correo, domicilio, localidad, provincia, cuenta corriente y límite, condición frente a ARCA y CUIT/DNI.
 - **Inventario:** varios códigos por artículo, dimensiones y equivalencias (rosca, junta, OEM), importación y exportación CSV, alarmas de stock, trazabilidad de cada movimiento y sugerencia de equivalentes cuando falta stock.
 - **Proveedores y compras:** órdenes de compra, ingreso de mercadería con actualización de costos, cuenta corriente y pagos desde una o varias cajas.
 - **Caja** con turnos, varias cajas, rubros financieros y arqueo. **Cuenta corriente** de clientes con límite.
