@@ -1,34 +1,51 @@
-# Taller Mecánico · Sistema VB (demo)
+# Tu Taller Car Center · Sistema VB (demo)
 
-Demo del sistema de gestión para talleres mecánicos y services del automotor, desarrollado por **VINCULAR BUSINESS**.
+Demo del sistema de gestión para **talleres y car centers**: mecánica, electricidad, **car audio**, **alarmas** y **accesorios**, con **menú digital** para clientes, **turnos online** y **Club de fidelización**. Desarrollado por **VINCULAR BUSINESS**.
 
-**Probar la demo:** https://raveholding.github.io/tallermecnicoSVBdemo/
+- **Sistema del taller:** https://raveholding.github.io/tallermecnicoSVBdemo/
+- **Menú digital que ven los clientes:** https://raveholding.github.io/tallermecnicoSVBdemo/#menu
 
 Archivo único: `index.html`. Abre en cualquier navegador y funciona sin internet. Los datos se guardan en el navegador del equipo o celular donde se usa.
 
 ## Cómo se usa la demo
-- **Abre con datos de ejemplo** (taller ficticio “Tu Taller Mecánico”). Se elige un perfil sin clave (dueño, jefe de taller, recepción o mecánico) para ver qué puede hacer cada rol. Los cambios quedan sólo en ese navegador; en *Configuración* se pueden restablecer los datos de ejemplo.
-- **Sistema vacío:** con el enlace *Probar el sistema vacío* (o abriendo `index.html#real`) arranca de cero, con clave del dueño, como lo usaría un taller real.
+- **Abre con datos de ejemplo** (negocio ficticio “Tu Taller Car Center”). Se elige un perfil sin clave (dueño, jefe de taller, recepción o mecánico) para ver qué puede hacer cada rol. En *Configuración* se pueden restablecer los datos de ejemplo.
+- **Menú digital:** desde el ingreso, el botón del costado *Ver menú digital* o `#menu`. Lo que se pide ahí aparece en *Menú digital y pedidos*.
+- **Sistema vacío:** *Probar el sistema vacío* (o `#real`) arranca de cero, con clave del dueño, como lo usaría un negocio real. Su menú es `#real-menu`.
 
 ## Módulos
-Órdenes de trabajo · Ventas de mostrador · Turnos · Clientes y vehículos · Repuestos e inventario · Proveedores y compras · Caja · Equipamiento · Seguridad y ambiente · Personal · Reportes · Configuración.
+Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital y pedidos** · Clientes y vehículos · **Club y fidelización** · **Garantías** · Repuestos e inventario · Proveedores y compras · Caja · Equipamiento · Seguridad y ambiente · Personal · Reportes · Configuración.
 
-## Lo principal
-- **Flujo de la orden de trabajo:** Recibido → Diagnóstico (mecánico) → Presupuesto (jefe / dueño) → En reparación → Listo → Entregado y cobrado.
-- **El mecánico no ve precios** en ninguna pantalla ni impresión. Ve sus órdenes y las que están sin asignar. Carga el diagnóstico con hasta 6 fotos y recomienda repuestos o trabajos.
-- **Presupuesto** armado por el dueño o el jefe y aprobado por el cliente sin cobro. Se cobra al entregar el vehículo, con adicionales, descuento por renglón o sobre el total e IVA opcional. Envío por WhatsApp e impresión.
-- **Condición frente a ARCA:** al elegir el cliente en la OT o en la venta (y el proveedor en las compras) se indica su condición: Consumidor Final, Responsable Inscripto, Monotributo, Exento, etc. El CUIT se valida y la condición queda guardada en la ficha y en el comprobante interno.
-- **Alta completa del cliente** desde la ficha, una nueva OT, un turno o una venta: nombre o razón social, teléfono, correo, domicilio, localidad, provincia, cuenta corriente y límite, condición frente a ARCA y CUIT/DNI.
-- **Inventario:** varios códigos por artículo, dimensiones y equivalencias (rosca, junta, OEM), importación y exportación CSV, alarmas de stock, trazabilidad de cada movimiento y sugerencia de equivalentes cuando falta stock.
-- **Proveedores y compras:** órdenes de compra, ingreso de mercadería con actualización de costos, cuenta corriente y pagos desde una o varias cajas.
-- **Caja** con turnos, varias cajas, rubros financieros y arqueo. **Cuenta corriente** de clientes con límite.
-- **Turnos** por puesto de trabajo, **equipamiento**, **seguridad e higiene** (EPP, matafuegos, residuos, habilitaciones) y **reportes** con exportación.
-- **Roles y claves por persona** (cifradas) y auditoría de las acciones. Respaldo y restauración en JSON.
+## Lo que suma esta demo para un negocio completo
+- **Áreas de trabajo:** Mecánica, Electricidad, Car audio y multimedia, Alarmas y seguridad, Accesorios y estética. Cada orden lleva su tipo de trabajo. Las instalaciones suman el **control del estado eléctrico previo** (batería, tablero, levantavidrios, audio original, llaves y controles), que se imprime en la orden, y van al **box de instalaciones** de la agenda. Hay un técnico de car audio y alarmas de ejemplo.
+- **Catálogo de servicios** (27 de ejemplo) con área, descripción para el cliente, precio neto, “precio desde”, duración, **garantía en meses** y si se publica en el menú. Es el mismo catálogo que se usa en las órdenes.
+- **Productos de car audio, alarmas y accesorios** en el inventario (multimedia, parlantes, subwoofer, potencias, alarmas, cierre centralizado, sensores, GPS, cámaras, LED, polarizado, levantavidrios), con proveedores, stock y garantía.
+- **Menú digital público** (celular primero): servicios por área con precio final con IVA, duración y garantía; productos publicados con buscador y estado de stock (“Disponible”, “Últimas unidades”, “Sin stock”), nunca la cantidad ni el costo. Tiene un **carrito** que arma el pedido (retiro o instalación en el taller) y lo **envía por WhatsApp**, además de WhatsApp, Instagram y “Cómo llegar”.
+- **Turnos online:** el cliente elige servicio y día y ve **solo los horarios libres** (según la agenda, el puesto que corresponde y la duración; sábados de 9 a 13, domingos cerrado). El pedido queda para confirmar en el sistema, que crea cliente, vehículo y turno, controla que no se pisen horarios y abre el WhatsApp de confirmación o de rechazo.
+- **Pedidos del menú en el sistema:** bandeja con aviso en el panel y en el menú lateral. Un pedido se puede **pasar a la venta de mostrador** con un toque, convertir en turno, responder por WhatsApp, marcar como atendido o descartar.
+- **Club y fidelización:** puntos por cada $ gastado en órdenes entregadas y ventas con cliente identificado (configurable; lo pagado con puntos no suma). Tiene **niveles** Bronce, Plata y Oro por puntos acumulados, **premios para canjear**, **canje de puntos como medio de pago** al cobrar la orden, ajustes auditados, libro de movimientos y tarjeta imprimible tamaño tarjeta de crédito. Desde el menú el cliente se **suma al Club** (mayor de 18, con consentimiento) y **ve su tarjeta** con WhatsApp y fecha de nacimiento: puntos, nivel, sus vehículos con el próximo service y sus garantías vigentes.
+- **Recordatorios por WhatsApp listos para mandar:** próximo service (vencido o en 30 días), cumpleaños del mes con el beneficio, garantías por vencer y clientes que no vienen hace más de 6 meses.
+- **Garantías:** se crean solas al entregar una orden o vender un equipo con garantía. Muestra el **N.º de serie** del equipo, el estado (vigente, por vencer o vencida) y los **reclamos**, que pueden abrir una orden de trabajo.
+- Todo lo del sistema base: flujo de la orden con diagnóstico y fotos, mecánico sin precios, presupuesto, cobro con adicionales y descuentos, condición frente a ARCA y alta completa del cliente, inventario con equivalencias y trazabilidad, compras, caja, seguridad e higiene, reportes, roles, claves y respaldo.
 
 ## Límites (no afirmar más que esto)
-- Los datos viven sólo en el navegador y el equipo donde se usan. No hay sincronización entre dispositivos ni copia en la nube; para eso hace falta un servidor.
-- La clave es un control de uso del sistema, no seguridad de servidor.
-- Sin facturación electrónica ni pagos reales: la condición frente a ARCA es un dato de registro, el sistema no emite facturas ni consulta el padrón.
-- Los datos del taller, las personas, los clientes y los vehículos de la demo son ficticios.
+- **Sin nube en la demo:** los pedidos, turnos y altas al Club que se hacen desde el menú quedan en el navegador donde se hicieron (en la demo, el mismo equipo) y además se envían por WhatsApp. Para que lleguen solos a todos los equipos del taller hace falta la nube del Sistema VB (servidor).
+- El pedido del menú es una **consulta por WhatsApp**, no un cobro: no hay pago online. Los precios del menú son de referencia y el taller los confirma.
+- La tarjeta del Club se consulta en el menú. No hay Apple Wallet ni Google Wallet.
+- Los mensajes de WhatsApp se abren armados y los envía una persona: no hay envíos automáticos ni API de WhatsApp Business.
+- El QR del menú no se genera dentro del sistema: se arma con cualquier generador a partir del enlace.
+- Sin facturación electrónica: la condición frente a ARCA es un dato de registro.
+- Los datos del negocio, las personas, los clientes, los vehículos, los precios y los productos de la demo son ficticios o de ejemplo. Normativa de polarizado y abonos de GPS: **[VERIFICAR]**.
+
+## Cómo se arma (para desarrollo)
+La demo se genera a partir del sistema de SebaChavez Car Service, para que las mejoras del sistema del cliente lleguen también a la demo:
+
+```sh
+sh tools/build.sh /ruta/a/Sebachavezcarervice/index.html
+```
+
+- `tools/mk_demo.py`: quita los datos del cliente y pone los del negocio de ejemplo (nombre, logo, datos, base local propia).
+- `tools/demo_seed.js`: áreas, catálogo, productos, Club y datos de ejemplo de los módulos extra.
+- `tools/demo_ext.js`: menú digital, pedidos y turnos web, catálogo, Club, garantías y tipos de trabajo.
+- `tools/demo_patch.py`: engancha los módulos al sistema.
 
 Desarrollado por **VINCULAR BUSINESS** · (387) 4484132 · vincularbusiness@gmail.com · “Tu idea, en buenas manos.”
