@@ -5,16 +5,18 @@ const AREA_INST=['ele','aud','ala','acc'];
 const CLUBDEF={on:true,cada:1000,ptsx:1,valor:20,niveles:[{n:'Bronce',d:0,b:'Sumás puntos en cada service, instalación y compra'},{n:'Plata',d:400,b:'Lavado de motor sin cargo en cada service'},{n:'Oro',d:1200,b:'5 % menos en mano de obra y prioridad de turno'}],cumple:'10 % de descuento en mano de obra durante tu mes de cumpleaños',vence:12};
 const MENUDEF={bienvenida:'Mecánica, car audio, alarmas y accesorios en un solo lugar.',horario:'Lunes a viernes de 8:30 a 18 · Sábados de 9 a 13',precios:true,turnos:true,club:true};
 const PREMIOSDEF=[{id:'pr1',n:'Lavado de motor',pts:250,d:'Con desengrasante y secado'},{id:'pr2',n:'Revisión de alarma y controles',pts:300,d:'Chequeo, batería de controles y ajuste de sensores'},{id:'pr3',n:'Kit LED para patente',pts:400,d:'Par de lámparas LED instaladas'},{id:'pr4',n:'Alineación sin cargo',pts:900,d:'Alineación computarizada'}];
+const DEMOVER='car3';
 const tel10=t=>String(t||'').replace(/\D/g,'').slice(-10);
-function extMigrar(o){o.cfg=o.cfg||{};o.seq=o.seq||{};
+function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==='function')return migrar(seed());
+ o.cfg=o.cfg||{};o.seq=o.seq||{};
  if(!o.cfg.club)o.cfg.club=JSON.parse(JSON.stringify(CLUBDEF));if(!o.cfg.menu)o.cfg.menu=Object.assign({},MENUDEF);
  ['solic','pedidos','ptsMov','garantias'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});if(!Array.isArray(o.premios))o.premios=PREMIOSDEF.map(x=>Object.assign({},x));
  (o.servicios||[]).forEach(s=>{if(!s.area)s.area='mec';if(s.pub==null)s.pub=true;if(s.gar==null)s.gar=0;if(s.desc==null)s.desc='';if(s.desde==null)s.desde=false});
- (o.repuestos||[]).forEach(r=>{if(r.pub==null)r.pub=false;if(r.gar==null)r.gar=0});(o.ots||[]).forEach(x=>{if(!x.area)x.area='mec'});
+ (o.repuestos||[]).forEach(r=>{if(r.pub==null)r.pub=false;if(r.gar==null)r.gar=0;if(r.inst==null)r.inst='';if(r.dest==null)r.dest=false});(o.ots||[]).forEach(x=>{if(!x.area)x.area='mec'});
  (o.clientes||[]).forEach(c=>{if(c.club==null)c.club=false;if(c.pts==null)c.pts=0;if(c.nac==null)c.nac='';if(c.socio==null)c.socio=0});
  if(!o.seq.socio)o.seq.socio=Math.max(0,...(o.clientes||[]).map(c=>c.socio||0));['ped','sol'].forEach(k=>{if(!o.seq[k])o.seq[k]=0});return o}
 function extSeed(d){
- d.cfg.nombre='Tu Taller Car Center';
+ d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
  ['solic','pedidos','ptsMov','garantias'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});d.premios=PREMIOSDEF.map(x=>Object.assign({},x));d.cfg.club=JSON.parse(JSON.stringify(CLUBDEF));d.cfg.menu=Object.assign({},MENUDEF);
  if(!d.users.some(u=>u.id==='u8'))d.users.splice(d.users.length-1,0,{id:'u8',n:'Franco Díaz',rol:'mecanico',esp:'Car audio, alarmas y electricidad',com:8});
  /* áreas del catálogo existente */
@@ -36,7 +38,7 @@ function extSeed(d){
   ['acc','Luces LED en faros',15000,1,6,'Lámparas LED de alta potencia, con canceller si hace falta',false],
   ['acc','Pulido y restauración de ópticas',22000,1.5,0,'Par de ópticas delanteras',false]];
  NS.forEach((s,i)=>d.servicios.push({id:'s'+(13+i),area:s[0],n:s[1],pu:s[2],h:s[3],gar:s[4],desc:s[5],desde:s[6],pub:true}));
- ['CAR AUDIO','ALARMAS Y SEGURIDAD','ACCESORIOS'].forEach(r=>{if(!d.rubrosRep.includes(r))d.rubrosRep.push(r)});
+ ['CAR AUDIO','ALARMAS Y SEGURIDAD','ACCESORIOS','INTERIOR Y CONFORT','LIMPIEZA Y CUIDADO','EMERGENCIA Y AUXILIO'].forEach(r=>{if(!d.rubrosRep.includes(r))d.rubrosRep.push(r)});
  ['PIONEER','JBL','SONY','POSITRON','X-28','PHILIPS','3M','GENÉRICO'].forEach(m=>{if(!d.marcas.includes(m))d.marcas.push(m)});
  d.provs.push({id:'p6',n:'Audio Center Mayorista (ejemplo)',cuit:mkCuit('3071',7781),tel:'3874601122',mail:'ventas@audiocenter.example',activo:true,cond:'RI'});
  d.provs.push({id:'p7',n:'Seguridad Vehicular Norte (ejemplo)',cuit:mkCuit('3070',6620),tel:'3874602233',mail:'pedidos@segnorte.example',activo:true,cond:'RI'});
@@ -58,9 +60,34 @@ function extSeed(d){
   ['LED-H4','Kit LED H4 6000K (par)','PHILIPS','ACCESORIOS','p1',38000,50,6,2,4,6,'Faros con lámpara H4'],
   ['LED-H7','Kit LED H7 6000K (par)','PHILIPS','ACCESORIOS','p1',36000,50,4,2,4,6,'Faros con lámpara H7'],
   ['POL-35','Film polarizado 35 % (un auto)','3M','ACCESORIOS','p6',38000,60,5,2,4,0,'Con certificado [VERIFICAR normativa vigente]'],
-  ['LVD-KIT-2P','Kit levantavidrios eléctricos (par)','GENÉRICO','ACCESORIOS','p7',65000,45,3,1,2,6,'Puertas delanteras']];
+  ['LVD-KIT-2P','Kit levantavidrios eléctricos (par)','GENÉRICO','ACCESORIOS','p7',65000,45,3,1,2,6,'Puertas delanteras'],
+  ['TWT-PAR','Tweeters (par) con crossover','JBL','CAR AUDIO','p6',32000,45,6,2,4,12,'Para pilares o puertas delanteras'],
+  ['WOOF-10','Woofer 10" 600 W','PIONEER','CAR AUDIO','p6',98000,40,3,1,2,12,'Para cajón cerrado o ported'],
+  ['INT-CMD','Interfaz de comandos al volante','GENÉRICO','CAR AUDIO','p6',26000,55,4,1,3,6,'Según marca y modelo del auto'],
+  ['MARCO-2DIN','Marco adaptador 2 DIN','GENÉRICO','CAR AUDIO','p6',12000,60,8,2,4,0,'Según modelo del auto'],
+  ['CORTA-CORR','Corta corriente oculto','GENÉRICO','ALARMAS Y SEGURIDAD','p7',15000,60,6,2,4,12,'Universal 12 V'],
+  ['TRABA-VOL','Traba volante reforzada','GENÉRICO','ALARMAS Y SEGURIDAD','p7',22000,50,5,2,4,6,'Universal'],
+  ['DASHCAM-FHD','Cámara dashcam Full HD con visión nocturna','GENÉRICO','ACCESORIOS','p6',45000,50,4,1,3,6,'Graba en memoria microSD'],
+  ['BARRA-LED','Barra LED 4x4 de 32"','GENÉRICO','ILUMINACIÓN','p1',58000,50,2,1,2,6,'Camionetas y 4x4'],
+  ['LED-T10','Lámparas LED de posición T10 (par)','PHILIPS','ILUMINACIÓN','p1',4500,90,20,4,10,6,'Posición, patente y tablero'],
+  ['SOP-CEL','Soporte de celular magnético','GENÉRICO','INTERIOR Y CONFORT','p1',6500,80,15,4,10,0,'Para rejilla de aire'],
+  ['CARG-USBC','Cargador 12 V doble USB-C carga rápida','GENÉRICO','INTERIOR Y CONFORT','p1',8500,80,12,4,10,3,''],
+  ['FUND-ASI','Fundas de asiento (juego completo)','GENÉRICO','INTERIOR Y CONFORT','p1',52000,50,4,1,3,0,'Cuero ecológico · universales'],
+  ['CUB-VOL','Cubre volante de cuero ecológico','GENÉRICO','INTERIOR Y CONFORT','p1',9800,80,10,3,6,0,'Volantes de 37 a 39 cm'],
+  ['ALF-GOMA','Alfombras de goma (juego de 4)','GENÉRICO','INTERIOR Y CONFORT','p1',18000,70,6,2,4,0,'Universales recortables'],
+  ['AROMA','Aromatizante para salida de aire','GENÉRICO','INTERIOR Y CONFORT','p1',2500,100,30,6,20,0,'Varias fragancias'],
+  ['SHAMPOO','Shampoo para autos con cera 1 L','GENÉRICO','LIMPIEZA Y CUIDADO','p1',6000,80,12,3,8,0,''],
+  ['KIT-LIMP','Kit de limpieza interior con microfibra','GENÉRICO','LIMPIEZA Y CUIDADO','p1',16000,70,6,2,4,0,'Tablero, tapizados y vidrios'],
+  ['REST-OPT','Kit restaurador de ópticas','GENÉRICO','LIMPIEZA Y CUIDADO','p1',12000,70,5,2,4,0,'Para un par de ópticas'],
+  ['INFL-12V','Inflador de neumáticos 12 V digital','GENÉRICO','EMERGENCIA Y AUXILIO','p1',28000,55,5,2,4,6,'Con corte automático'],
+  ['MATAF-1KG','Matafuegos 1 kg con soporte','GENÉRICO','EMERGENCIA Y AUXILIO','p1',19000,50,8,3,6,12,'Para circular [VERIFICAR normativa y carga]'],
+  ['BALIZAS','Balizas triangulares (par)','GENÉRICO','EMERGENCIA Y AUXILIO','p1',7000,70,10,3,6,0,''],
+  ['KIT-EMERG','Kit de emergencia (cables, linterna y chaleco)','GENÉRICO','EMERGENCIA Y AUXILIO','p1',21000,60,4,2,4,0,''],
+  ['ARRANC-PORT','Arrancador portátil de batería 12 V','GENÉRICO','EMERGENCIA Y AUXILIO','p1',75000,45,3,1,2,12,'Nafta hasta 3.0 y diésel hasta 2.0']];
+ const INST={'MM-68-CP':'s13','EST-1DIN-BT':'s13','INT-CMD':'s13','MARCO-2DIN':'s13','PAR-65-2V':'s14','PAR-69-3V':'s14','TWT-PAR':'s14','SUB-12-CJ':'s15','POT-4CH-800':'s15','WOOF-10':'s15','ALA-2C-BLQ':'s18','ALA-PRES':'s18','CIE-CEN-4P':'s19','SEN-EST-4':'s20','GPS-4G':'s21','CAM-RET-HD':'s16','LED-H4':'s26','LED-H7':'s26','POL-35':'s25','LVD-KIT-2P':'s23','CORTA-CORR':'s24','DASHCAM-FHD':'s24','BARRA-LED':'s24'};
+ const DEST=['MM-68-CP','PAR-65-2V','ALA-2C-BLQ','DASHCAM-FHD','LED-H4','FUND-ASI','SEN-EST-4','ARRANC-PORT'];
  const n0=d.repuestos.length;
- NP.forEach((p,i)=>{const pv=r2(p[5]*(1+p[6]/100));d.repuestos.push({id:'r'+(n0+i+1),cod:p[0],codProv:p[0],desc:p[1],marca:p[2],rubro:p[3],provId:p[4],pc:p[5],gan:p[6],pv:pv,qty:p[7],alarma:p[8],repos:p[9],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:p[11],activo:true,cods:[],oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:'',fVerif:'',hist:[],pub:true,gar:p[10]});
+ NP.forEach((p,i)=>{const pv=r2(p[5]*(1+p[6]/100));d.repuestos.push({id:'r'+(n0+i+1),cod:p[0],codProv:p[0],desc:p[1],marca:p[2],rubro:p[3],provId:p[4],pc:p[5],gan:p[6],pv:pv,qty:p[7],alarma:p[8],repos:p[9],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:p[11],activo:true,cods:[],oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:'',fVerif:'',hist:[],pub:true,gar:p[10],inst:INST[p[0]]||'',dest:DEST.includes(p[0])});
   d.kardex.push({id:'k'+(n0+i+1),t:Date.now()-864e5*30,repId:'r'+(n0+i+1),tipo:'Saldo inicial (ejemplo)',delta:p[7],saldo:p[7],ref:'',u:'sistema'})});
  d.repuestos.forEach(r=>{if(r.pub==null){r.pub=['ACEITE LUBRICANTE','BATERÍAS','ILUMINACIÓN'].includes(r.rubro);r.gar=r.rubro==='BATERÍAS'?12:0}});
  /* Club: socios de ejemplo */

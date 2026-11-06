@@ -359,16 +359,18 @@ const AREA_INST=['ele','aud','ala','acc'];
 const CLUBDEF={on:true,cada:1000,ptsx:1,valor:20,niveles:[{n:'Bronce',d:0,b:'Sumás puntos en cada service, instalación y compra'},{n:'Plata',d:400,b:'Lavado de motor sin cargo en cada service'},{n:'Oro',d:1200,b:'5 % menos en mano de obra y prioridad de turno'}],cumple:'10 % de descuento en mano de obra durante tu mes de cumpleaños',vence:12};
 const MENUDEF={bienvenida:'Mecánica, car audio, alarmas y accesorios en un solo lugar.',horario:'Lunes a viernes de 8:30 a 18 · Sábados de 9 a 13',precios:true,turnos:true,club:true};
 const PREMIOSDEF=[{id:'pr1',n:'Lavado de motor',pts:250,d:'Con desengrasante y secado'},{id:'pr2',n:'Revisión de alarma y controles',pts:300,d:'Chequeo, batería de controles y ajuste de sensores'},{id:'pr3',n:'Kit LED para patente',pts:400,d:'Par de lámparas LED instaladas'},{id:'pr4',n:'Alineación sin cargo',pts:900,d:'Alineación computarizada'}];
+const DEMOVER='car3';
 const tel10=t=>String(t||'').replace(/\D/g,'').slice(-10);
-function extMigrar(o){o.cfg=o.cfg||{};o.seq=o.seq||{};
+function extMigrar(o){if(o.modo==='practica'&&o.demoVer!==DEMOVER&&typeof seed==='function')return migrar(seed());
+ o.cfg=o.cfg||{};o.seq=o.seq||{};
  if(!o.cfg.club)o.cfg.club=JSON.parse(JSON.stringify(CLUBDEF));if(!o.cfg.menu)o.cfg.menu=Object.assign({},MENUDEF);
  ['solic','pedidos','ptsMov','garantias'].forEach(k=>{if(!Array.isArray(o[k]))o[k]=[]});if(!Array.isArray(o.premios))o.premios=PREMIOSDEF.map(x=>Object.assign({},x));
  (o.servicios||[]).forEach(s=>{if(!s.area)s.area='mec';if(s.pub==null)s.pub=true;if(s.gar==null)s.gar=0;if(s.desc==null)s.desc='';if(s.desde==null)s.desde=false});
- (o.repuestos||[]).forEach(r=>{if(r.pub==null)r.pub=false;if(r.gar==null)r.gar=0});(o.ots||[]).forEach(x=>{if(!x.area)x.area='mec'});
+ (o.repuestos||[]).forEach(r=>{if(r.pub==null)r.pub=false;if(r.gar==null)r.gar=0;if(r.inst==null)r.inst='';if(r.dest==null)r.dest=false});(o.ots||[]).forEach(x=>{if(!x.area)x.area='mec'});
  (o.clientes||[]).forEach(c=>{if(c.club==null)c.club=false;if(c.pts==null)c.pts=0;if(c.nac==null)c.nac='';if(c.socio==null)c.socio=0});
  if(!o.seq.socio)o.seq.socio=Math.max(0,...(o.clientes||[]).map(c=>c.socio||0));['ped','sol'].forEach(k=>{if(!o.seq[k])o.seq[k]=0});return o}
 function extSeed(d){
- d.cfg.nombre='Tu Taller Car Center';
+ d.cfg.nombre='Tu Taller Car Center';d.demoVer=DEMOVER;
  ['solic','pedidos','ptsMov','garantias'].forEach(k=>{if(!Array.isArray(d[k]))d[k]=[]});d.premios=PREMIOSDEF.map(x=>Object.assign({},x));d.cfg.club=JSON.parse(JSON.stringify(CLUBDEF));d.cfg.menu=Object.assign({},MENUDEF);
  if(!d.users.some(u=>u.id==='u8'))d.users.splice(d.users.length-1,0,{id:'u8',n:'Franco Díaz',rol:'mecanico',esp:'Car audio, alarmas y electricidad',com:8});
  /* áreas del catálogo existente */
@@ -390,7 +392,7 @@ function extSeed(d){
   ['acc','Luces LED en faros',15000,1,6,'Lámparas LED de alta potencia, con canceller si hace falta',false],
   ['acc','Pulido y restauración de ópticas',22000,1.5,0,'Par de ópticas delanteras',false]];
  NS.forEach((s,i)=>d.servicios.push({id:'s'+(13+i),area:s[0],n:s[1],pu:s[2],h:s[3],gar:s[4],desc:s[5],desde:s[6],pub:true}));
- ['CAR AUDIO','ALARMAS Y SEGURIDAD','ACCESORIOS'].forEach(r=>{if(!d.rubrosRep.includes(r))d.rubrosRep.push(r)});
+ ['CAR AUDIO','ALARMAS Y SEGURIDAD','ACCESORIOS','INTERIOR Y CONFORT','LIMPIEZA Y CUIDADO','EMERGENCIA Y AUXILIO'].forEach(r=>{if(!d.rubrosRep.includes(r))d.rubrosRep.push(r)});
  ['PIONEER','JBL','SONY','POSITRON','X-28','PHILIPS','3M','GENÉRICO'].forEach(m=>{if(!d.marcas.includes(m))d.marcas.push(m)});
  d.provs.push({id:'p6',n:'Audio Center Mayorista (ejemplo)',cuit:mkCuit('3071',7781),tel:'3874601122',mail:'ventas@audiocenter.example',activo:true,cond:'RI'});
  d.provs.push({id:'p7',n:'Seguridad Vehicular Norte (ejemplo)',cuit:mkCuit('3070',6620),tel:'3874602233',mail:'pedidos@segnorte.example',activo:true,cond:'RI'});
@@ -412,9 +414,34 @@ function extSeed(d){
   ['LED-H4','Kit LED H4 6000K (par)','PHILIPS','ACCESORIOS','p1',38000,50,6,2,4,6,'Faros con lámpara H4'],
   ['LED-H7','Kit LED H7 6000K (par)','PHILIPS','ACCESORIOS','p1',36000,50,4,2,4,6,'Faros con lámpara H7'],
   ['POL-35','Film polarizado 35 % (un auto)','3M','ACCESORIOS','p6',38000,60,5,2,4,0,'Con certificado [VERIFICAR normativa vigente]'],
-  ['LVD-KIT-2P','Kit levantavidrios eléctricos (par)','GENÉRICO','ACCESORIOS','p7',65000,45,3,1,2,6,'Puertas delanteras']];
+  ['LVD-KIT-2P','Kit levantavidrios eléctricos (par)','GENÉRICO','ACCESORIOS','p7',65000,45,3,1,2,6,'Puertas delanteras'],
+  ['TWT-PAR','Tweeters (par) con crossover','JBL','CAR AUDIO','p6',32000,45,6,2,4,12,'Para pilares o puertas delanteras'],
+  ['WOOF-10','Woofer 10" 600 W','PIONEER','CAR AUDIO','p6',98000,40,3,1,2,12,'Para cajón cerrado o ported'],
+  ['INT-CMD','Interfaz de comandos al volante','GENÉRICO','CAR AUDIO','p6',26000,55,4,1,3,6,'Según marca y modelo del auto'],
+  ['MARCO-2DIN','Marco adaptador 2 DIN','GENÉRICO','CAR AUDIO','p6',12000,60,8,2,4,0,'Según modelo del auto'],
+  ['CORTA-CORR','Corta corriente oculto','GENÉRICO','ALARMAS Y SEGURIDAD','p7',15000,60,6,2,4,12,'Universal 12 V'],
+  ['TRABA-VOL','Traba volante reforzada','GENÉRICO','ALARMAS Y SEGURIDAD','p7',22000,50,5,2,4,6,'Universal'],
+  ['DASHCAM-FHD','Cámara dashcam Full HD con visión nocturna','GENÉRICO','ACCESORIOS','p6',45000,50,4,1,3,6,'Graba en memoria microSD'],
+  ['BARRA-LED','Barra LED 4x4 de 32"','GENÉRICO','ILUMINACIÓN','p1',58000,50,2,1,2,6,'Camionetas y 4x4'],
+  ['LED-T10','Lámparas LED de posición T10 (par)','PHILIPS','ILUMINACIÓN','p1',4500,90,20,4,10,6,'Posición, patente y tablero'],
+  ['SOP-CEL','Soporte de celular magnético','GENÉRICO','INTERIOR Y CONFORT','p1',6500,80,15,4,10,0,'Para rejilla de aire'],
+  ['CARG-USBC','Cargador 12 V doble USB-C carga rápida','GENÉRICO','INTERIOR Y CONFORT','p1',8500,80,12,4,10,3,''],
+  ['FUND-ASI','Fundas de asiento (juego completo)','GENÉRICO','INTERIOR Y CONFORT','p1',52000,50,4,1,3,0,'Cuero ecológico · universales'],
+  ['CUB-VOL','Cubre volante de cuero ecológico','GENÉRICO','INTERIOR Y CONFORT','p1',9800,80,10,3,6,0,'Volantes de 37 a 39 cm'],
+  ['ALF-GOMA','Alfombras de goma (juego de 4)','GENÉRICO','INTERIOR Y CONFORT','p1',18000,70,6,2,4,0,'Universales recortables'],
+  ['AROMA','Aromatizante para salida de aire','GENÉRICO','INTERIOR Y CONFORT','p1',2500,100,30,6,20,0,'Varias fragancias'],
+  ['SHAMPOO','Shampoo para autos con cera 1 L','GENÉRICO','LIMPIEZA Y CUIDADO','p1',6000,80,12,3,8,0,''],
+  ['KIT-LIMP','Kit de limpieza interior con microfibra','GENÉRICO','LIMPIEZA Y CUIDADO','p1',16000,70,6,2,4,0,'Tablero, tapizados y vidrios'],
+  ['REST-OPT','Kit restaurador de ópticas','GENÉRICO','LIMPIEZA Y CUIDADO','p1',12000,70,5,2,4,0,'Para un par de ópticas'],
+  ['INFL-12V','Inflador de neumáticos 12 V digital','GENÉRICO','EMERGENCIA Y AUXILIO','p1',28000,55,5,2,4,6,'Con corte automático'],
+  ['MATAF-1KG','Matafuegos 1 kg con soporte','GENÉRICO','EMERGENCIA Y AUXILIO','p1',19000,50,8,3,6,12,'Para circular [VERIFICAR normativa y carga]'],
+  ['BALIZAS','Balizas triangulares (par)','GENÉRICO','EMERGENCIA Y AUXILIO','p1',7000,70,10,3,6,0,''],
+  ['KIT-EMERG','Kit de emergencia (cables, linterna y chaleco)','GENÉRICO','EMERGENCIA Y AUXILIO','p1',21000,60,4,2,4,0,''],
+  ['ARRANC-PORT','Arrancador portátil de batería 12 V','GENÉRICO','EMERGENCIA Y AUXILIO','p1',75000,45,3,1,2,12,'Nafta hasta 3.0 y diésel hasta 2.0']];
+ const INST={'MM-68-CP':'s13','EST-1DIN-BT':'s13','INT-CMD':'s13','MARCO-2DIN':'s13','PAR-65-2V':'s14','PAR-69-3V':'s14','TWT-PAR':'s14','SUB-12-CJ':'s15','POT-4CH-800':'s15','WOOF-10':'s15','ALA-2C-BLQ':'s18','ALA-PRES':'s18','CIE-CEN-4P':'s19','SEN-EST-4':'s20','GPS-4G':'s21','CAM-RET-HD':'s16','LED-H4':'s26','LED-H7':'s26','POL-35':'s25','LVD-KIT-2P':'s23','CORTA-CORR':'s24','DASHCAM-FHD':'s24','BARRA-LED':'s24'};
+ const DEST=['MM-68-CP','PAR-65-2V','ALA-2C-BLQ','DASHCAM-FHD','LED-H4','FUND-ASI','SEN-EST-4','ARRANC-PORT'];
  const n0=d.repuestos.length;
- NP.forEach((p,i)=>{const pv=r2(p[5]*(1+p[6]/100));d.repuestos.push({id:'r'+(n0+i+1),cod:p[0],codProv:p[0],desc:p[1],marca:p[2],rubro:p[3],provId:p[4],pc:p[5],gan:p[6],pv:pv,qty:p[7],alarma:p[8],repos:p[9],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:p[11],activo:true,cods:[],oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:'',fVerif:'',hist:[],pub:true,gar:p[10]});
+ NP.forEach((p,i)=>{const pv=r2(p[5]*(1+p[6]/100));d.repuestos.push({id:'r'+(n0+i+1),cod:p[0],codProv:p[0],desc:p[1],marca:p[2],rubro:p[3],provId:p[4],pc:p[5],gan:p[6],pv:pv,qty:p[7],alarma:p[8],repos:p[9],venc:false,fvenc:'',pAnt:0,fAct:'',iva:21,rosca:'',junta:'',apl:p[11],activo:true,cods:[],oem:'',eq:[],largo:'',ancho:'',alto:'',dext:'',dint:'',valv:'',picos:'',obs:'',fuente:'',fVerif:'',hist:[],pub:true,gar:p[10],inst:INST[p[0]]||'',dest:DEST.includes(p[0])});
   d.kardex.push({id:'k'+(n0+i+1),t:Date.now()-864e5*30,repId:'r'+(n0+i+1),tipo:'Saldo inicial (ejemplo)',delta:p[7],saldo:p[7],ref:'',u:'sistema'})});
  d.repuestos.forEach(r=>{if(r.pub==null){r.pub=['ACEITE LUBRICANTE','BATERÍAS','ILUMINACIÓN'].includes(r.rubro);r.gar=r.rubro==='BATERÍAS'?12:0}});
  /* Club: socios de ejemplo */
@@ -1404,6 +1431,11 @@ ACT.mok=()=>{if(!MODAL||!MODAL.onOk)return;merr('');try{const r=MODAL.onOk();if(
 '.clubcard{width:330px;max-width:100%;border-radius:16px;padding:16px;color:#fff;background:linear-gradient(135deg,#1e6fd0,#123f7a);box-shadow:0 8px 22px rgba(0,0,0,.2);margin:8px auto}.clubcard.Plata{background:linear-gradient(135deg,#8a97a8,#4c5562)}.clubcard.Oro{background:linear-gradient(135deg,#d9a520,#8a5a00)}'+
 '.clubcard .big{font-size:2rem;font-weight:800;line-height:1}.clubcard .sm{opacity:.9}.lvbar{height:8px;background:rgba(255,255,255,.3);border-radius:8px;overflow:hidden;margin-top:8px}.lvbar span{display:block;height:100%;background:#fff}'+
 '#pub .achips{display:flex;gap:6px;overflow-x:auto;padding:2px 0 4px}#pub .achips button{flex:0 0 auto;border:1px solid var(--bd);background:#fff;border-radius:999px;padding:6px 12px;cursor:pointer}'+
+'#pub .cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin:6px 0 4px}#pub .cat{border:1px solid var(--bd);background:#fff;border-radius:12px;padding:12px 10px;text-align:left;cursor:pointer;display:flex;gap:10px;align-items:center}#pub .cat.on{border-color:var(--azul);box-shadow:0 0 0 2px var(--azul) inset}#pub .cat .e{font-size:1.6rem;width:42px;height:42px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex:0 0 42px}'+
+'#pub .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}#pub .pc{background:#fff;border:1px solid var(--bd);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}#pub .pc .im{height:120px;display:flex;align-items:center;justify-content:center;font-size:3.4rem;cursor:pointer;position:relative}#pub .pc .im .dst{position:absolute;top:8px;left:8px;background:var(--rojo);color:#fff;font-size:.72rem;font-weight:700;padding:3px 8px;border-radius:999px}'+
+'#pub .pc .bd{padding:10px 12px;display:flex;flex-direction:column;gap:4px;flex:1}#pub .pc .nm{font-weight:700;cursor:pointer;line-height:1.25}#pub .pc .pp{font-size:1.15rem;font-weight:800;margin-top:auto}#pub .pc .bt{display:flex;flex-direction:column;gap:6px;padding:0 12px 12px}#pub .pc .bt .btn{width:100%}'+
+'#pub .hs{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scroll-snap-type:x mandatory}#pub .hs .pc{flex:0 0 220px;scroll-snap-align:start}'+
+'@media(max-width:560px){#pub .pgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}#pub .pc .im{height:90px;font-size:2.6rem}#pub .pc .bd{padding:8px}#pub .pc .bt{padding:0 8px 8px}#pub .pc .pp{font-size:1rem}#pub .cats{display:flex;overflow-x:auto;padding-bottom:4px}#pub .cat{flex:0 0 175px}#pub .hs .pc{flex-basis:170px}}'+
 '@media(max-width:560px){#pub .it{flex-wrap:wrap}#pub .it>.sp{flex:1 1 calc(100% - 60px)}#pub .it>.r{width:100%;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #eef1f4;padding-top:8px}#pub .it>.r .row,#pub .it>.r .btn{margin-top:0!important}}';document.head.appendChild(st)})();
 
 /* ---------- utilidades ---------- */
@@ -1532,8 +1564,9 @@ function webPrdHTML(){const q=norm(UI.prdQ),R=UI.prdRub;const L=DB.repuestos.fil
  const pubN=DB.repuestos.filter(r=>r.activo&&r.pub).length;
  return '<p class="sm mut">Elegí qué artículos del inventario se muestran en el menú digital ('+pubN+' publicados). El menú muestra el precio final con IVA y si hay stock (“Disponible”, “Últimas unidades” o “Sin stock”), nunca la cantidad ni el costo.</p>'+
  '<div class="row" style="margin-bottom:8px"><input id="prq" style="max-width:260px" placeholder="Buscar artículo…" value="'+h(UI.prdQ)+'" data-chg="prdq" aria-label="Buscar"><select style="max-width:220px" data-chg="prdrub" aria-label="Rubro">'+opts(DB.rubrosRep,R,null,'Todos los rubros')+'</select>'+(ed?'<button class="btn s" data-act="prdall" data-v="1">Publicar los filtrados</button><button class="btn s" data-act="prdall" data-v="0">Despublicar los filtrados</button>':'')+'</div>'+
- '<div class="tw"><table class="itbl"><thead><tr><th>Publicado</th><th>Artículo</th><th>Rubro</th><th class="n">Precio final</th><th>Stock</th><th class="n">Garantía (meses)</th></tr></thead><tbody>'+L.slice(0,300).map(r=>'<tr><td class="c"><input type="checkbox" data-chg="prdpub" data-id="'+r.id+'"'+(r.pub?' checked':'')+(ed?'':' disabled')+' style="width:auto;min-height:0" aria-label="Publicar '+h(r.desc)+'"></td><td>'+h(r.desc)+' <span class="mut sm">'+h(r.marca+' · '+r.cod)+'</span></td><td class="sm">'+h(r.rubro)+'</td><td class="n">'+fmt(precioFinal(r.pv,r.iva))+'</td><td>'+stockTag(r).replace('class="tag','class="badge')+'</td><td><input data-chg="prdgar" data-id="'+r.id+'" inputmode="numeric" value="'+(r.gar||0)+'" style="width:64px;text-align:right"'+(ed?'':' disabled')+' aria-label="Garantía"></td></tr>').join('')+(L.length?'':'<tr><td colspan="6" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'}
+ '<div class="tw"><table class="itbl"><thead><tr><th>Publicado</th><th>Artículo</th><th>Rubro</th><th class="n">Precio final</th><th>Stock</th><th class="n">Garantía (meses)</th><th>Destacado</th></tr></thead><tbody>'+L.slice(0,300).map(r=>'<tr><td class="c"><input type="checkbox" data-chg="prdpub" data-id="'+r.id+'"'+(r.pub?' checked':'')+(ed?'':' disabled')+' style="width:auto;min-height:0" aria-label="Publicar '+h(r.desc)+'"></td><td>'+h(r.desc)+' <span class="mut sm">'+h(r.marca+' · '+r.cod)+'</span></td><td class="sm">'+h(r.rubro)+'</td><td class="n">'+fmt(precioFinal(r.pv,r.iva))+'</td><td>'+stockTag(r).replace('class="tag','class="badge')+'</td><td><input data-chg="prdgar" data-id="'+r.id+'" inputmode="numeric" value="'+(r.gar||0)+'" style="width:64px;text-align:right"'+(ed?'':' disabled')+' aria-label="Garantía"></td><td class="c"><input type="checkbox" data-chg="prddest" data-id="'+r.id+'"'+(r.dest?' checked':'')+(ed?'':' disabled')+' style="width:auto;min-height:0" aria-label="Destacado"></td></tr>').join('')+(L.length?'':'<tr><td colspan="7" class="mut c">Sin resultados.</td></tr>')+'</tbody></table></div>'}
 CHG.prdq=t=>{UI.prdQ=t.value;const p=t.selectionStart;renderView();const n=$('#prq');if(n){n.focus();try{n.setSelectionRange(p,p)}catch(e){}}};
+CHG.prddest=t=>{if(!isBoss())return;const r=repOf(t.dataset.id);if(r){r.dest=t.checked;save()}};
 CHG.prdrub=t=>{UI.prdRub=t.value;renderView()};
 CHG.prdpub=t=>{if(!isBoss())return;const r=repOf(t.dataset.id);if(r){r.pub=t.checked;save()}};
 CHG.prdgar=t=>{if(!isBoss())return;const r=repOf(t.dataset.id);const v=parseInt(t.value);if(r&&v>=0&&v<=120){r.gar=v;t.style.borderColor='';save()}else t.style.borderColor='var(--bad)'};
@@ -1623,12 +1656,12 @@ ACT.garrecl=d=>{const g=DB.garantias.find(x=>x.id===d.id);if(!g)return;modal({ti
   save();renderView();return true}})};
 
 /* ======================= MENÚ DIGITAL PÚBLICO ======================= */
-const PUB={tab:'srv',cart:[],q:'',me:null};
+const PUB={tab:'prd',cart:[],q:'',me:null,cat:''};
 try{const k=localStorage.getItem('tmvb_menu_tarjeta_'+MODO);if(k)PUB.me=k}catch(e){}
 function renderMenu(){document.title=DB.cfg.nombre+' · Menú digital';$('#login').hidden=true;$('#app').hidden=true;let p=$('#pub');if(!p){p=document.createElement('div');p.id='pub';document.body.appendChild(p)}p.innerHTML=menuHTML();
  const pb=$('#pbanner');if(pb)pb.remove()}
 function menuHTML(){const C=DB.cfg,M=C.menu;const n=PUB.cart.reduce((a,i)=>a+i.qty,0);
- const tabs=[['srv','🧰 Servicios'],['prd','📦 Productos']].concat(M.turnos?[['tur','📅 Pedir turno']]:[]).concat(M.club&&C.club.on?[['club','⭐ Club']]:[]);
+ const tabs=[['prd','🛒 Tienda'],['srv','🧰 Servicios']].concat(M.turnos?[['tur','📅 Pedir turno']]:[]).concat(M.club&&C.club.on?[['club','⭐ Club']]:[]);
  return '<div class="ph"><img src="'+LOGO+'" alt="Logo de '+h(C.nombre)+'"><h1>'+h(C.nombre)+'</h1><p>'+h(M.bienvenida)+'</p><p class="sm">📍 '+h(C.dir)+' · 🕘 '+h(M.horario)+'</p><div class="row"><a class="btn" target="_blank" rel="noopener" href="'+h(wa(C.tel,'Hola '+C.nombre+', les escribo desde el menú digital.'))+'">💬 WhatsApp</a>'+(C.ig?'<a class="btn" style="background:#fff;color:#c13584;border-color:#fff" target="_blank" rel="noopener" href="https://instagram.com/'+encodeURIComponent(C.ig)+'">Instagram</a>':'')+'<a class="btn" style="background:transparent;color:#fff;border-color:#888" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(C.dir)+'">Cómo llegar</a></div></div>'+
  (MODO==='practica'?'<div class="demoflag" style="margin-bottom:6px"><b>DEMO del menú digital</b> · taller y precios de ejemplo. <a href="'+h(location.href.split('#')[0])+'">Entrar al sistema del taller</a></div>':'')+
  '<div class="tabs" role="tablist">'+tabs.map(t=>'<button role="tab" aria-selected="'+(PUB.tab===t[0])+'" class="'+(PUB.tab===t[0]?'on':'')+'" data-act="pubtab" data-t="'+t[0]+'">'+t[1]+'</button>').join('')+'</div>'+
@@ -1641,15 +1674,32 @@ const pubPrice=(neto,iva,desde)=>DB.cfg.menu.precios&&neto>0?(desde?'desde ':'')
 function pubSrvHTML(){const S=DB.servicios.filter(s=>s.pub);let o='<div class="achips">'+AREAS.filter(a=>S.some(s=>s.area===a[0])).map(a=>'<button data-act="pubgo" data-a="'+a[0]+'">'+a[2]+' '+h(a[1])+'</button>').join('')+'</div>';
  AREAS.forEach(a=>{const L=S.filter(s=>s.area===a[0]);if(!L.length)return;o+='<div class="ah" id="pa_'+a[0]+'" style="scroll-margin-top:60px"><span style="font-size:1.4rem">'+a[2]+'</span><h2>'+h(a[1])+'</h2></div>'+L.map(s=>'<div class="it"><div class="ic">'+a[2]+'</div><div class="sp"><b>'+h(s.n)+'</b>'+(s.desc?'<div class="sm mut">'+h(s.desc)+'</div>':'')+'<div>'+(s.h?'<span class="tag">⏱ '+(s.h<1?Math.round(s.h*60)+' min':String(s.h).replace('.',',')+' h')+'</span>':'')+(s.gar?'<span class="tag ok">🛡 Garantía '+s.gar+(s.gar===1?' mes':' meses')+'</span>':'')+'</div></div><div class="r"><div class="pr">'+pubPrice(s.pu,21,s.desde)+'</div><div class="row" style="justify-content:flex-end;margin-top:6px">'+(DB.cfg.menu.turnos?'<button class="btn s" data-act="pubturno" data-id="'+s.id+'">📅 Turno</button>':'')+'<button class="btn s p" data-act="pubadd" data-k="srv" data-id="'+s.id+'">Agregar</button></div></div></div>').join('')});
  return o||'<p class="mut">Pronto vas a ver acá nuestros servicios.</p>'}
-function pubPrdHTML(){const q=norm(PUB.q);const P=DB.repuestos.filter(r=>r.activo&&r.pub&&(!q||norm(r.desc+' '+r.marca+' '+r.rubro+' '+(r.apl||'')).includes(q)));const R=[...new Set(P.map(r=>r.rubro))];
- const ico=r=>/AUDIO/.test(r)?'🔊':/ALARMA/.test(r)?'🚨':/ACCESORIO/.test(r)?'✨':/BATER/.test(r)?'🔋':/ACEITE/.test(r)?'🛢️':/ILUMIN/.test(r)?'💡':'📦';
- return '<input id="pubq" placeholder="Buscar: parlantes, alarma, aceite…" value="'+h(PUB.q)+'" data-chg="pubq" style="margin:4px 0 6px" aria-label="Buscar productos">'+
- (R.map(rb=>'<div class="ah"><span style="font-size:1.3rem">'+ico(rb)+'</span><h2>'+h(rb.charAt(0)+rb.slice(1).toLowerCase())+'</h2></div>'+P.filter(r=>r.rubro===rb).map(r=>'<div class="it"><div class="ic">'+ico(rb)+'</div><div class="sp"><b>'+h(r.desc)+'</b><div class="sm mut">'+h(r.marca)+(r.apl?' · '+h(r.apl.split('\n')[0]):'')+'</div><div>'+stockTag(r)+(r.gar?'<span class="tag ok">🛡 '+r.gar+' meses</span>':'')+(['CAR AUDIO','ALARMAS Y SEGURIDAD','ACCESORIOS'].includes(r.rubro)?'<span class="tag">Instalación en el taller</span>':'')+'</div></div><div class="r"><div class="pr">'+pubPrice(r.pv,r.iva)+'</div><button class="btn s p" style="margin-top:6px" data-act="pubadd" data-k="rep" data-id="'+r.id+'"'+(r.qty<=0?' disabled':'')+'>'+(r.qty<=0?'Sin stock':'Agregar')+'</button></div></div>').join('')).join('')||'<p class="mut">No encontramos productos con esa búsqueda.</p>')}
+const CATS={'CAR AUDIO':['🔊','#e8f0fe','Car audio'],'ALARMAS Y SEGURIDAD':['🚨','#fdecec','Alarmas y seguridad'],'ACCESORIOS':['✨','#f3e8ff','Accesorios'],'ILUMINACIÓN':['💡','#fff7d6','Iluminación'],'INTERIOR Y CONFORT':['🚗','#e7f6ec','Interior y confort'],'LIMPIEZA Y CUIDADO':['🧽','#e0f7fa','Limpieza y cuidado'],'EMERGENCIA Y AUXILIO':['🧯','#ffefe0','Emergencia y auxilio'],'ACEITE LUBRICANTE':['🛢️','#eef1f4','Lubricantes'],'BATERÍAS':['🔋','#eef1f4','Baterías']};
+const catOf=rb=>CATS[rb]||['📦','#eef1f4',rb.charAt(0)+rb.slice(1).toLowerCase()];
+const pubProds=()=>DB.repuestos.filter(r=>r.activo&&r.pub);
+function pubCard(r){const c=catOf(r.rubro),sv=r.inst?srvOf(r.inst):null,inst=sv&&sv.pub,sin=r.qty<=0;
+ return '<div class="pc"><div class="im" style="background:'+c[1]+'" data-act="pubdet" data-id="'+r.id+'" role="button" aria-label="Ver '+h(r.desc)+'">'+c[0]+(r.dest?'<span class="dst">Destacado</span>':'')+'</div><div class="bd"><span class="sm mut">'+h(r.marca)+'</span><span class="nm" data-act="pubdet" data-id="'+r.id+'">'+h(r.desc)+'</span><div>'+stockTag(r)+(r.gar?'<span class="tag ok">🛡 '+r.gar+' m</span>':'')+'</div><span class="pp">'+pubPrice(r.pv,r.iva)+'</span></div>'+
+ '<div class="bt"><button class="btn s p" data-act="pubadd" data-k="rep" data-id="'+r.id+'"'+(sin?' disabled':'')+'>'+(sin?'Sin stock':'🛒 Agregar')+'</button>'+(inst&&!sin?'<button class="btn s" style="flex-direction:column;line-height:1.2;gap:1px" data-act="pubaddi" data-id="'+r.id+'"><span>🔧 Con instalación</span>'+(DB.cfg.menu.precios&&sv.pu?'<span class="sm mut">+ '+fmt(precioFinal(sv.pu,21))+'</span>':'')+'</button>':'')+'</div></div>'}
+function pubPrdHTML(){const q=norm(PUB.q),P=pubProds();const R=Object.keys(CATS).filter(k=>P.some(r=>r.rubro===k)).concat([...new Set(P.map(r=>r.rubro))].filter(k=>!CATS[k]));
+ let o='<input id="pubq" placeholder="Buscar: parlantes, alarma, LED, fundas…" value="'+h(PUB.q)+'" data-chg="pubq" style="margin:4px 0 8px" aria-label="Buscar productos">';
+ if(q){const L=P.filter(r=>norm(r.desc+' '+r.marca+' '+r.rubro+' '+(r.apl||'')).includes(q));return o+'<p class="sm mut">'+L.length+' resultado(s)</p>'+(L.length?'<div class="pgrid">'+L.map(pubCard).join('')+'</div>':'<p class="mut">No encontramos productos con esa búsqueda. Escribinos por WhatsApp y te lo conseguimos.</p>')}
+ o+='<div class="cats">'+[['','🛍️','#fff','Todo']].concat(R.map(k=>[k].concat([catOf(k)[0],catOf(k)[1],catOf(k)[2]]))).map(c=>'<button class="cat'+(PUB.cat===c[0]?' on':'')+'" data-act="pubcat" data-c="'+h(c[0])+'"><span class="e" style="background:'+c[2]+'">'+c[1]+'</span><span><b>'+h(c[3])+'</b><br><span class="sm mut">'+(c[0]?P.filter(r=>r.rubro===c[0]).length:P.length)+' productos</span></span></button>').join('')+'</div>';
+ if(!PUB.cat){const D=P.filter(r=>r.dest);if(D.length)o+='<div class="ah"><span style="font-size:1.3rem">⭐</span><h2>Destacados</h2></div><div class="hs">'+D.map(pubCard).join('')+'</div>';
+  R.forEach(k=>{const L=P.filter(r=>r.rubro===k);o+='<div class="ah" id="pc_'+h(k.replace(/\W/g,''))+'"><span style="font-size:1.3rem">'+catOf(k)[0]+'</span><h2>'+h(catOf(k)[2])+'</h2></div><div class="pgrid">'+L.map(pubCard).join('')+'</div>'})}
+ else o+='<div class="ah"><span style="font-size:1.3rem">'+catOf(PUB.cat)[0]+'</span><h2>'+h(catOf(PUB.cat)[2])+'</h2></div><div class="pgrid">'+P.filter(r=>r.rubro===PUB.cat).map(pubCard).join('')+'</div>';
+ return o+'<p class="sm mut" style="margin-top:10px">¿No encontrás lo que buscás? <a target="_blank" rel="noopener" href="'+h(wa(DB.cfg.tel,'Hola '+DB.cfg.nombre+', ¿tienen…?'))+'">Preguntanos por WhatsApp</a>.</p>'}
+ACT.pubcat=d=>{PUB.cat=d.c;renderMenu()};
+ACT.pubaddi=d=>{const r=repOf(d.id);if(!r)return;ACT.pubadd({k:'rep',id:r.id});const sv=srvOf(r.inst);if(sv&&!PUB.cart.some(x=>x.k==='srv'&&x.id===sv.id))PUB.cart.push(Object.assign(pubItem('srv',sv.id),{qty:1}));renderMenu();toast('Agregado con instalación')};
+ACT.pubdet=d=>{const r=repOf(d.id);if(!r)return;const c=catOf(r.rubro),sv=r.inst?srvOf(r.inst):null,sin=r.qty<=0;
+ modal({title:r.desc,hideOk:true,cancel:'Cerrar',body:'<div style="background:'+c[1]+';border-radius:12px;height:160px;display:flex;align-items:center;justify-content:center;font-size:4.5rem">'+c[0]+'</div><p style="margin:10px 0 4px"><b>'+h(r.marca)+'</b> · '+h(catOf(r.rubro)[2])+'</p>'+(r.apl?'<p class="sm">'+h(r.apl).replace(/\n/g,'<br>')+'</p>':'')+
+  '<p>'+stockTag(r).replace(/class="tag/g,'class="badge')+(r.gar?' <span class="badge ok">Garantía '+r.gar+' meses</span>':'')+'</p><p style="font-size:1.4rem;font-weight:800;margin:6px 0">'+pubPrice(r.pv,r.iva)+'</p>'+(sv&&sv.pub?'<p class="sm">🔧 Instalación en el taller: <b>'+h(sv.n)+'</b> · '+pubPrice(sv.pu,21,sv.desde)+(sv.gar?' · garantía '+sv.gar+' meses':'')+'</p>':'')+
+  '<div class="row"><button class="btn p" data-act="pubdetadd" data-id="'+r.id+'" data-i="0"'+(sin?' disabled':'')+'>🛒 Agregar</button>'+(sv&&sv.pub&&!sin?'<button class="btn" data-act="pubdetadd" data-id="'+r.id+'" data-i="1">🔧 Agregar con instalación</button>':'')+'<a class="btn" target="_blank" rel="noopener" href="'+h(wa(DB.cfg.tel,'Hola '+DB.cfg.nombre+', consulto por: '+r.desc+' ('+r.marca+').'))+'">💬 Consultar</a></div>'})};
+ACT.pubdetadd=d=>{closeModal();if(d.i==='1')ACT.pubaddi({id:d.id});else ACT.pubadd({k:'rep',id:d.id})};
 CHG.pubq=t=>{PUB.q=t.value;const b=$('#pubbody');if(b){b.innerHTML=pubPrdHTML();const n=$('#pubq');if(n){n.focus();const p=t.value.length;try{n.setSelectionRange(p,p)}catch(e){}}}};
 function pubItem(k,id){if(k==='srv'){const s=srvOf(id);return s?{k,id,desc:s.n,pu:DB.cfg.menu.precios?precioFinal(s.pu,21):0,max:20}:null}const r=repOf(id);return r?{k,id,desc:r.desc+' ('+r.marca+')',pu:DB.cfg.menu.precios?precioFinal(r.pv,r.iva):0,max:Math.max(0,r.qty)}:null}
 ACT.pubadd=d=>{const it=pubItem(d.k,d.id);if(!it)return;const ex=PUB.cart.find(x=>x.k===d.k&&x.id===d.id);if(ex){if(ex.qty>=it.max){toast('No hay más unidades disponibles.',1);return}ex.qty++}else{if(it.max<1){toast('Sin stock.',1);return}PUB.cart.push(Object.assign(it,{qty:1}))}toast('Agregado al pedido');renderMenu()};
 const pubCartTot=()=>r2(PUB.cart.reduce((a,i)=>a+i.qty*i.pu,0));
-function pubCartHTML(){if(!PUB.cart.length)return '<p class="mut">Tu pedido está vacío. Agregá servicios o productos.</p>';const inst=PUB.cart.some(i=>i.k==='rep'&&['CAR AUDIO','ALARMAS Y SEGURIDAD','ACCESORIOS'].includes((repOf(i.id)||{}).rubro));
+function pubCartHTML(){if(!PUB.cart.length)return '<p class="mut">Tu pedido está vacío. Agregá servicios o productos.</p>';const inst=PUB.cart.some(i=>i.k==='srv')||PUB.cart.some(i=>i.k==='rep'&&(repOf(i.id)||{}).inst);
  return '<h2>Tu pedido</h2>'+PUB.cart.map((i,ix)=>'<div class="it"><div class="sp"><b>'+h(i.desc)+'</b><div class="sm mut">'+(i.k==='srv'?'Servicio':'Producto')+' · '+(i.pu?fmt(i.pu)+' c/u':'precio a confirmar')+'</div></div><div class="row" style="flex-wrap:nowrap"><button class="btn s" data-act="pubqty" data-i="'+ix+'" data-n="-1" aria-label="Quitar uno">−</button><b>'+i.qty+'</b><button class="btn s" data-act="pubqty" data-i="'+ix+'" data-n="1" aria-label="Agregar uno">+</button></div></div>').join('')+
  '<p class="r"><b style="font-size:1.2rem">Total estimado '+fmt(pubCartTot())+'</b></p>'+
  '<div class="card"><h3>Tus datos</h3><div class="g2"><div class="f"><label for="pc_n">Nombre y apellido</label><input id="pc_n" autocomplete="name"></div><div class="f"><label for="pc_t">WhatsApp</label><input id="pc_t" inputmode="tel" autocomplete="tel" placeholder="3875123456"></div><div class="f"><label for="pc_v">Vehículo (marca y modelo)</label><input id="pc_v" placeholder="Ej.: Peugeot 208"></div><div class="f"><label for="pc_e">¿Cómo lo querés?</label><select id="pc_e"><option value="instalar"'+(inst?' selected':'')+'>Que me lo instalen en el taller</option><option value="retiro"'+(inst?'':' selected')+'>Lo retiro en el local</option></select></div></div><div class="f"><label for="pc_x">Comentario (opcional)</label><input id="pc_x" placeholder="Día que preferís, dudas…"></div>'+
@@ -1658,7 +1708,7 @@ ACT.pubqty=d=>{const i=PUB.cart[+d.i];if(!i)return;i.qty+=+d.n;const it=pubItem(
 ACT.pubsend=()=>{const n=val('pc_n').trim(),t=val('pc_t').replace(/\D/g,'');if(n.length<3){toast('Escribí tu nombre.',1);return}if(t.length<10){toast('Escribí tu WhatsApp con característica (10 números).',1);return}if(!PUB.cart.length)return;
  DB.seq.ped=(DB.seq.ped||0)+1;const p={id:uid('pw'),num:DB.seq.ped,t:Date.now(),n,tel:t,veh:val('pc_v').trim().slice(0,60),entrega:val('pc_e'),nota:val('pc_x').trim().slice(0,200),estado:'Nuevo',items:PUB.cart.map(i=>({k:i.k,id:i.id,qty:i.qty,desc:i.desc,pu:i.pu}))};DB.pedidos.unshift(p);save();
  const msg='Hola '+DB.cfg.nombre+'! Quiero hacer este pedido (N.º '+String(p.num).padStart(4,'0')+'):\n'+p.items.map(i=>'• '+i.qty+' × '+i.desc+(i.pu?' — '+fmt(i.qty*i.pu):'')).join('\n')+'\nTotal estimado: '+fmt(pubCartTot())+'\n'+(p.entrega==='instalar'?'Quiero que me lo instalen.':'Lo retiro en el local.')+(p.veh?'\nVehículo: '+p.veh:'')+(p.nota?'\n'+p.nota:'')+'\nNombre: '+n;
- window.open(wa(DB.cfg.tel,msg),'_blank','noopener');PUB.cart=[];PUB.tab='srv';renderMenu();toast('¡Pedido enviado! El taller te responde por WhatsApp.')};
+ window.open(wa(DB.cfg.tel,msg),'_blank','noopener');PUB.cart=[];PUB.tab='prd';renderMenu();toast('¡Pedido enviado! El taller te responde por WhatsApp.')};
 /* turnos desde el menú */
 PUB.sid='';
 ACT.pubturno=d=>{PUB.sid=d.id;PUB.tf='';PUB.tab='tur';renderMenu();window.scrollTo(0,0)};
