@@ -47,6 +47,28 @@ Panel · Órdenes de trabajo · Ventas de mostrador · Turnos · **Menú digital
   - Avisos de documentación por vencer, pedidos para aprobar y tareas vencidas.
 - Todo lo del sistema base: flujo de la orden con diagnóstico y fotos, mecánico sin precios, presupuesto, cobro con adicionales y descuentos, condición frente a ARCA y alta completa del cliente, inventario con equivalencias y trazabilidad, compras, caja, seguridad e higiene, reportes, roles, claves y respaldo.
 
+## Diseño Sistema VB (esqueleto V27.2, sección 7)
+Capa de diseño común a los dos sistemas (`tools/vb_ux.js`). No quita funciones: reordena y agrega.
+- **Barra lateral por secciones plegables:** Operación del taller · Logística e inventario · Clientes y fidelidad · Equipo · Sistema. Arriba van los botones principales **Vender [F1]** y **Nueva orden [F2]**, y en la barra se ven los avisos (órdenes, stock bajo en amarillo, pedidos y tareas).
+- **Barra superior:** nombre del negocio, estado (modo, caja abierta o cerrada, de un día anterior en rojo), **buscador Ctrl + K**, **campana de avisos** con lista, **tema** (Automático → Claro → Oscuro), acceso al menú público y usuario con su rol.
+- **Buscador universal (Ctrl + K):**
+  - Busca por patente, cliente (nombre, teléfono o CUIT), N.º de OT, repuesto (código exacto, parcial o descripción) y pantallas.
+  - Tolera errores de tipeo: “arqeo” lleva a Caja.
+  - Un repuesto elegido se agrega a la venta. Sólo muestra lo que el rol puede abrir.
+- **Tema claro, oscuro y automático:** sólo cambia variables CSS, lo hace en < 5 ms y recuerda la elección en cada equipo. El menú público queda siempre en claro.
+- **Ayuda en contexto:** cada pantalla tiene una línea que dice para qué sirve y por dónde empezar.
+- **Panel “Hoy”** (dueño y jefe de taller):
+  - Cobrado hoy contra ayer, órdenes abiertas con presupuestos esperando, turnos y stock en alerta.
+  - Últimos cobros y tendencia de los últimos 7 días contra la semana anterior.
+  - Sin indicadores repetidos.
+- **Caja:** tablero del turno con estado (verde abierta, gris cerrada, rojo si es de un día anterior), **4 pasos del día** con el paso actual marcado y como atajo, ingresos y egresos, duración y ticket promedio.
+- **Módulos activables** (Configuración → Módulos): menú digital, Club, garantías, tareas y RR. HH. avanzado. Apagarlos sólo los oculta; los datos quedan.
+- **Créditos** completos: Celular (387) 4484132 · www.vincularbusiness.com.ar · correo, con botones WhatsApp · Llamar · Página web · Correo.
+- **Accesibilidad:**
+  - Contraste AA verificado por auditor automático: 0 textos por debajo de 4,5:1 en todas las pantallas de dueño, recepción y mecánico, en claro y en oscuro, más ventanas, ingreso y menú público.
+  - Controles de ≥ 44 px, sin desbordes de 320 a 1440 px y respeta “reducir movimiento”.
+- Pruebas en `tools/pruebas/` (ver LEEME).
+
 ## Límites (no afirmar más que esto)
 - **Sin nube en la demo:** los pedidos, turnos y altas al Club que se hacen desde el menú quedan en el navegador donde se hicieron (en la demo, el mismo equipo) y además se envían por WhatsApp. Para que lleguen solos a todos los equipos del taller hace falta la nube del Sistema VB (servidor).
 - El pedido del menú es una **consulta por WhatsApp**, no un cobro: no hay pago online. Los precios del menú son de referencia y el taller los confirma.
@@ -69,6 +91,7 @@ sh tools/build.sh /ruta/a/Sebachavezcarervice/tools/base.html
 - `tools/demo_seed.js`: áreas, catálogo, productos, Club y datos de ejemplo de los módulos extra.
 - `tools/demo_ext.js`: menú digital, pedidos y turnos web, catálogo, Club, garantías y tipos de trabajo.
 - `tools/demo_rrhh_seed.js` y `tools/demo_rrhh.js`: Personal y RR. HH. (legajos, asistencia, licencias, organigrama, sueldos) y Tareas.
+- `tools/vb_ux.js`: capa de diseño del Sistema VB (barra, Ctrl + K, avisos, tema, panel Hoy, tablero de caja, módulos, créditos).
 - `tools/demo_patch.py`: engancha los módulos al sistema.
 
 Desarrollado por **VINCULAR BUSINESS** · (387) 4484132 · vincularbusiness@gmail.com · “Tu idea, en buenas manos.”
