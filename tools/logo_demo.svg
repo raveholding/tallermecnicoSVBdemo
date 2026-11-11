@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360">
+<circle cx="180" cy="150" r="112" fill="none" stroke="#e53935" stroke-width="16" stroke-dasharray="360 344" transform="rotate(-200 180 150)"/>
+<circle cx="180" cy="150" r="112" fill="none" stroke="#1e6fd0" stroke-width="16" stroke-dasharray="330 374" transform="rotate(-10 180 150)"/>
+<g fill="#3a3d43">
+<path d="M112 168 l16-44 q4-10 16-10 h72 q12 0 16 10 l16 44 q14 2 14 16 v28 h-14 a20 20 0 0 1-40 0 h-56 a20 20 0 0 1-40 0 h-14 v-28 q0-14 14-16z M134 166 h92 l-11-34 q-2-5-8-5 h-54 q-6 0-8 5z"/>
+<circle cx="140" cy="212" r="11" fill="#fff"/><circle cx="220" cy="212" r="11" fill="#fff"/>
+</g>
+<path d="M248 64 a26 26 0 0 0-34 32 l-28 28 12 12 28-28 a26 26 0 0 0 32-34 l-14 14-12-4-4-12z" fill="#1e6fd0"/>
+<text x="180" y="304" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="800" font-size="40" fill="#e53935">TU TALLER</text>
+<text x="180" y="342" text-anchor="middle" font-family="Arial,Helvetica,sans-serif" font-weight="700" font-size="21" fill="#3a3d43" letter-spacing="1">CAR CENTER · SISTEMA VB</text>
+</svg>

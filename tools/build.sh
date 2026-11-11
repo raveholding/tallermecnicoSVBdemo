@@ -5,3 +5,4 @@ set -e
 D=$(dirname "$0")
 python3 "$D/mk_demo.py" "$1" index.html
 python3 "$D/demo_patch.py" index.html
+python3 "$D/pwa.py" . "Tu Taller Car Center · Sistema VB" "Car Center" "$D/logo_demo.svg"

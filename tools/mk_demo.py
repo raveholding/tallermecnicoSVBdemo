@@ -22,7 +22,7 @@ svg='''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 360">
 </svg>'''
 uri='data:image/svg+xml;base64,'+base64.b64encode(svg.encode()).decode()
 s,n=re.subn(r'const LOGO="data:image/jpeg;base64,[^"]+";','const LOGO="'+uri+'";',s);assert n==1
-pass
+open(__import__('os').path.join(__import__('os').path.dirname(__import__('os').path.abspath(__file__)),'logo_demo.svg'),'w',encoding='utf-8').write(svg)
 rep('<title>SebaChavez Car Service · Sistema VB</title>','<title>Tu Taller Car Center · Sistema VB (demo)</title>')
 rep('<b>SebaChavez Car Service</b></div>','<b>Tu Taller Car Center</b></div>')
 rep("cfg:{nombre:'SebaChavez Car Service',dir:'Jujuy 251 - Salta',tel:'3875971922',mail:'schavezcarservice@gmail.com',fb:'sebachavezcarservice',ig:'sebachavez_carservice',",
