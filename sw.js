@@ -1,5 +1,5 @@
 /* Sistema VB · funcionamiento sin conexión (red primero, copia guardada si no hay internet) */
-const VERSION='41b9d7f2b017';const C='vb-app-'+VERSION;
+const VERSION='533dc9929f17';const C='vb-app-'+VERSION;
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(CORE)))});
 self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C&&x.startsWith('vb-app-')).map(x=>caches.delete(x)))).then(()=>self.clients.claim()))});

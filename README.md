@@ -88,6 +88,16 @@ Pantalla **Sistema → Datos y respaldo** (solo el dueño). Funciona sin interne
 - Los datos viven **en ese navegador y ese equipo**: hacer un respaldo al menos una vez por semana y guardarlo fuera del equipo. Borrar los datos del navegador borra el sistema.
 - Lo que necesita internet: compartir por WhatsApp, abrir mapas y recibir las versiones nuevas (cuando hay una, aparece el aviso para actualizar).
 
+## Configuración dinámica y acceso oculto (v6)
+
+- **Configuración por secciones**: Datos del negocio, Módulos, Funcionamiento, Mano de obra, Menú digital, Usuarios y accesos, Datos y respaldo y Auditoría. Están todas las opciones de antes.
+- **Buscador de ajustes** arriba ("IVA", "horario", "clave"…): lleva directo al ajuste y lo resalta. Tolera errores de tipeo.
+- **Puesta en marcha**: barra de progreso y lista de lo que falta (datos de contacto, precios sin cargar, respaldo vencido). Cada pendiente es un botón que lleva al lugar.
+- **Se guarda solo**: los datos del negocio y los precios se guardan mientras se escribe (aparece "✓ Guardado") y la vista previa muestra cómo lo ve el cliente. El nombre no se guarda si queda vacío.
+- **Interruptores** en lugar de casillas, con la explicación de cada opción.
+- **Mano de obra**: búsqueda, filtro por área y "Sin precio", precio con IVA al lado, acepta "10.000" y **aumento o baja por porcentaje** a todos o a los filtrados (redondea a la decena; las órdenes cargadas no cambian).
+- **Acceso oculto al panel**: en el menú digital público, **doble clic (o doble toque en el celular) sobre el logo** abre el ingreso al sistema. No se ve ningún botón y sigue pidiendo usuario y clave. Se apaga en Configuración → Menú digital.
+
 ## Límites (no afirmar más que esto)
 - **Sin nube en la demo:** los pedidos, turnos y altas al Club que se hacen desde el menú quedan en el navegador donde se hicieron (en la demo, el mismo equipo) y además se envían por WhatsApp. Para que lleguen solos a todos los equipos del taller hace falta la nube del Sistema VB (servidor).
 - El pedido del menú es una **consulta por WhatsApp**, no un cobro: no hay pago online. Los precios del menú son de referencia y el taller los confirma.
