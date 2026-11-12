@@ -109,6 +109,13 @@ Pantalla **Operación → Impresiones** (dueño, jefe de taller y recepción) y 
 - **Configuración → Impresión y datos fiscales**: CUIT (con control del dígito verificador), condición frente al IVA, Ingresos Brutos, inicio de actividades, texto al pie y condiciones de garantía. Hasta que se completen, la puesta en marcha lo marca como pendiente.
 - El QR usa la biblioteca qrcode-generator 2.0.4 (Kazuhiko Arase, licencia MIT), incluida dentro del archivo.
 
+## Ejemplos de ventas y compras, y demo limpia (v7.1)
+
+- Los datos de ejemplo suman 5 ventas de mostrador (consumidor final, monotributista y responsable inscripto, con distintos medios de pago), una de ellas con factura registrada, y 2 órdenes de compra pendientes. Así se pueden mostrar el ticket, el recibo, la orden de compra y el registro de factura sin cargar nada antes.
+- La versión de los datos de ejemplo pasó a `car5`: los datos de **práctica** guardados con la versión anterior se reemplazan solos por los nuevos. Los datos reales no se tocan.
+- **Demo limpia**: en el ingreso de la demo, "🧹 Probar el sistema limpio, con mis datos" abre el sistema vacío para que el taller cree su dueño y cargue lo suyo. Arriba queda la barra "DEMO LIMPIA" con "Volver a los datos de ejemplo" y "Vaciar y empezar de cero". Las dos opciones también están en Configuración → Datos y respaldo. Los datos de ejemplo y los de la prueba limpia se guardan por separado.
+- La demo trae datos fiscales de ejemplo (marcados "ejemplo") para que los comprobantes se vean completos.
+
 ## Límites (no afirmar más que esto)
 - **Sin nube en la demo:** los pedidos, turnos y altas al Club que se hacen desde el menú quedan en el navegador donde se hicieron (en la demo, el mismo equipo) y además se envían por WhatsApp. Para que lleguen solos a todos los equipos del taller hace falta la nube del Sistema VB (servidor).
 - El pedido del menú es una **consulta por WhatsApp**, no un cobro: no hay pago online. Los precios del menú son de referencia y el taller los confirma.
